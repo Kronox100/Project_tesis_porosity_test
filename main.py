@@ -23,9 +23,7 @@ class MyThread(QThread):
         self.nombre_variables = nombre_variables
 
     def run(self):
-        resultado = Soyarslan_no_cubico.funcion_app(self.archivo1,self.epsilon1, self.simbolo, 
-                                                    self.valor_permutaciones, self.nombre_resultante, 
-                                                    self.nombre_variables,self.valor_x,self.valor_y,self.valor_z)
+        resultado = Soyarslan_no_cubico.funcion_app(self.archivo1,self.epsilon1, self.simbolo, self.valor_permutaciones, self.nombre_resultante, self.nombre_variables,self.valor_x,self.valor_y,self.valor_z)
         self.resultado_signal.emit(resultado)
 
 class MainWindow(QWidget):
@@ -261,17 +259,17 @@ class MainWindow(QWidget):
             QMessageBox.information(None, "Permutations", "Incorrect Permutations Format")
             return
         try:
-            value_x = int(valor_x_var.text())
+            value_x = float(valor_x_var.text())
         except:
             QMessageBox.information(None, "X", "Incorrect Coord Format")
             return
         try:
-            value_y = int(valor_y_var.text())
+            value_y = float(valor_y_var.text())
         except:
             QMessageBox.information(None, "Y", "Incorrect Coord Format")
             return
         try:
-            value_z = int(valor_z_var.text())
+            value_z = float(valor_z_var.text())
         except:
             QMessageBox.information(None, "Z", "Incorrect Coord Format")
             return
@@ -279,7 +277,7 @@ class MainWindow(QWidget):
         nombre_variables = str(nombre_archivo.text())
         nombre_resultante = str(nombre_archivo.text() + ".dump")
         if simbolo == ">":
-            if epsilon1 != "" and valor_x_var !="" and valor_y_var != "" and valor_z_var != "" :
+            if epsilon1 != "" and value_x !="" and value_y != "" and value_z != "" :
                 variables = open("results/"+nombre_variables+".log", "w")
                 variables.write(("Epsilon 1: " + str(epsilon1)) + "\n")
                 variables.write(("Permutations: " + str(valor_permutaciones)) + "\n")
@@ -295,13 +293,13 @@ class MainWindow(QWidget):
                 self.ventana_procesando.show()
 
                 # Proceso en otro hilo
-                self.thread = MyThread(archivo1, epsilon1, simbolo , valor_permutaciones, nombre_resultante,nombre_variables,valor_x_var,valor_y_var,valor_z_var)
+                self.thread = MyThread(archivo1, epsilon1, simbolo , valor_permutaciones, nombre_resultante,nombre_variables,value_x,value_y,value_z)
                 self.thread.resultado_signal.connect(self.show_result)
                 self.thread.start()
             else:
                 QMessageBox.information(None, "", "Epsilon 1, X, Y and Z must have data")
         elif simbolo == "<":
-            if epsilon1 != "" and valor_x_var !="" and valor_y_var != "" and valor_z_var != "" :
+            if epsilon1 != "" and value_x !="" and value_y != "" and value_z != "" :
                 variables = open("results/variables.txt", "w")
                 variables.write(("Epsilon 1: " + str(epsilon1)) + "\n")
                 variables.write(("Permutations: " + str(valor_permutaciones)) + "\n")
@@ -317,12 +315,11 @@ class MainWindow(QWidget):
                 self.ventana_procesando.show()
 
                 # Proceso en otro hilo
-                self.thread = MyThread(archivo1, epsilon1, simbolo , valor_permutaciones, nombre_resultante,nombre_variables,valor_x_var,valor_y_var,valor_z_var)
+                self.thread = MyThread(archivo1, epsilon1, simbolo , valor_permutaciones, nombre_resultante,nombre_variables,value_x,value_y,value_z)
                 self.thread.resultado_signal.connect(self.show_result)
                 self.thread.start()
-                
             else:
-                QMessageBox.information(None, "", "Epsilon 2 must be less than Epsilon 1")
+                QMessageBox.information(None, "", "Epsilon 1, X, Y and Z must have data")
 
     def show_result(self, resultado):
         self.ventana_procesando.setWindowTitle(resultado[0])

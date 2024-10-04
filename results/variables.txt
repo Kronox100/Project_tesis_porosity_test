@@ -1,5 +1,4 @@
-Epsilon 1: 0.22
-Epsilon 2: -0.55
+Epsilon 1: 1.0
 Permutations: 11
+Coords: X: 0.22Y: 0.23Z: 0.24
 File 1: E1 < Values 
-File 2: E2 < Values < E1 

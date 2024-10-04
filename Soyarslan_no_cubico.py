@@ -29,7 +29,7 @@ def Formula_mayores(qi,archivo1,epsilon1,fi):
             for j in range(n):
                 valor += cos((qi[j][0]*((2*pi)/nocubico[0])*float(r[2]) + (qi[j][1]*((2*pi)/nocubico[1])*float(r[3]) + (qi[j][2]*((2*pi)/nocubico[2])*float(r[4]) + fi[j]))))#fi
             norm = sqrt(2/n)
-            valor = valor * norm
+            valor = valor * norm   
             if epsilon1 < valor:
                 ID += 1
                 texto = f"{ID} {r[1]} {r[2]} {r[3]} {r[4]}"
@@ -47,49 +47,6 @@ def Formula_mayores(qi,archivo1,epsilon1,fi):
     archivo.close()
     nuevo.close()
 
-def Formula2_mayores(qi,archivo2,epsilon1,epsilon2,fi):
-    archivo2 = open(archivo2, "r")
-    nuevo2 = open("process_files/file2.dump", "w")
-    x =y=z = 0
-    lineac = 0
-    datos =[]
-    nocubico = []
-    ID = 0
-    n = len(qi)
-    for linea in archivo2:
-        lineac += 1
-        valor = 0
-        r = linea.split(" ")
-        if lineac < 10:
-            datos.append(linea)
-            if lineac == 6:
-                x = float(r[1].rstrip()) - float(r[0])
-            elif lineac == 7:
-                y = float(r[1].rstrip()) - float(r[0])
-            elif lineac == 8:
-                z = float(r[1].rstrip()) - float(r[0])
-                nocubico = nocubicos(x,y,z,90,90,90)
-        elif lineac > 9:
-            for j in range(n):
-                valor += cos((qi[j][0]*((2*pi)/nocubico[0])*float(r[2]) + (qi[j][1]*((2*pi)/nocubico[1])*float(r[3]) + (qi[j][2]*((2*pi)/nocubico[2])*float(r[4]) + fi[j]))))#fi
-            norm = sqrt(2/n)
-            valor = valor * norm
-            if ((epsilon2 < valor) and (valor < epsilon1)):
-                ID += 1
-                texto = f"{ID} {r[1]} {r[2]} {r[3]} {r[4]}"
-                datos.append(texto)
-    datos[3] = str(ID) + "\n"
-    for i in range(0, len(datos)):
-        if i<9:
-            nuevo2.write(datos[i])
-        else:
-            nuevo2.write(datos[i].rstrip())
-            if i != len(datos) - 1:
-                nuevo2.write("\n")
-
-
-    archivo2.close()
-    nuevo2.close()
 
 def Formula_menores(qi,archivo1,epsilon1,fi):
     archivo = open(archivo1, "r")
@@ -155,14 +112,6 @@ def aleacion(archivo1, nombre_resultante, nombre_variables):
                     if contador1 == 6:
                         caja2 = linea.split()
                         break
-                        """for linea in archivo2:
-                            contador2 += 1
-                            if contador2 == 4:
-                                cantidad_archivo2 = int(linea)
-                            if contador2 == 6:
-                                caja2 = linea.split()
-                                break 
-                        ##cantidad_total = cantidad_archivo1 + cantidad_archivo2"""
                     variables = open("results/"+nombre_variables +".log", "a")
                     variables.write("Total Atoms: " + str(cantidad_archivo1)+"\n")
                     variables.write("Core File Percentage: "+str(cantidad_archivo1*100/cantidad_archivo1)+"\n")
@@ -198,7 +147,7 @@ def aleacion(archivo1, nombre_resultante, nombre_variables):
 def numerosiniciales(H,H2,nombre_variables,valor_x,valor_y,valor_z):
     x = y = z = 0
     permutaciones=[]
-    new_permutaciones=[]
+    list2=[]
     semilla(2)
     N=0
     for x in range(-H2,H2+1):
@@ -208,22 +157,20 @@ def numerosiniciales(H,H2,nombre_variables,valor_x,valor_y,valor_z):
                 if h==H**2:
                     N=N+1
                     permutaciones.append((x,y,z))
+                    list2.append((valor_x,valor_y,valor_z))
 
-#PRUEBA IF
-    """     for n in (permutaciones):
-            if permutaciones[n] < valor_x:
-                new_permutaciones.append(x,y,0)
-            elif permutaciones[n] > valor_y:
-                new_permutaciones.append(0,y,z)
-            elif permutaciones[n] < valor_z:
-                new_permutaciones.append(0,0,z)
-    """
+    for i in (permutaciones):
+        print(i[0],",",i[1],",",i[2]) # (-3,1,-1) < (valor_x,valor_y,valor_z)
+       # if i[0] < valor_x: 
+
+        
+
     variables = open("results/"+nombre_variables+".log", "a")
     random_seed = "Random Seed: "+str(2)+"\n"
     variables.write(random_seed)
     variables.close()
 
-    return permutaciones,new_permutaciones
+    return permutaciones
                                                                                                                                 
 def nocubicos(a,b,c,alpha,beta,gama):
     matriz = []
@@ -242,13 +189,10 @@ def crear_fi(permutaciones):
 def funcion_app(archivo1,epsilon1, simbolo, valor_permutaciones,nombre_resultante, nombre_variables,valor_x,valor_y,valor_z):
     if not os.path.exists("process_files"):
             os.makedirs("process_files")
-    permutaciones,new_permutaciones = numerosiniciales(sqrt(valor_permutaciones),valor_permutaciones, nombre_variables,valor_x,valor_y,valor_z)
+    permutaciones = numerosiniciales(sqrt(valor_permutaciones),valor_permutaciones, nombre_variables,valor_x,valor_y,valor_z)
     fi = crear_fi(permutaciones)
     if permutaciones == []:
         error = "Error in Permutations\nThere is no combination for:\n"+str(valor_permutaciones)+" = x^2 + y^2 + z^2"
-        return ("Permutations",error)
-    elif new_permutaciones == []:
-        error = "Error in Permutations\nThere is no combination for:\n"+str(valor_permutaciones)+" in Coords"
         return ("Permutations",error)
     else:
         try:
