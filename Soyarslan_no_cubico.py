@@ -96,7 +96,41 @@ def Formula_menores(qi,archivo1,epsilon1,fi):
 
     archivo.close()
     nuevo.close()
+def Casos_permutaciones(permutaciones, valor_x, valor_y, valor_z):
+    n_data = []
+    for i in permutaciones:
+        x, y, z = i  # Desempaquetamos los valores de la tupla
+        print("DATOS:", x, ",", y, ",", z)  # Mostrar la tupla (x, y, z)
 
+        # Evaluar casos para X
+        if x < valor_x:
+            new_x = valor_x
+        elif x > valor_x:
+            new_x = x
+        else:  # x == valor_x
+            new_x = x
+
+        # Evaluar casos para Y
+        if y < valor_y:
+            new_y = valor_y
+        elif y > valor_y:
+            new_y = y
+        else:  # y == valor_y
+            new_y = y
+
+        # Evaluar casos para Z
+        if z < valor_z:
+            new_z = valor_z
+        elif z > valor_z:
+            new_z = z
+        else:  # z == valor_z
+            new_z = z
+
+        # Añadimos el resultado final para esta tupla
+        n_data.append((new_x, new_y, new_z))
+
+    return n_data
+           
 
 def aleacion(archivo1, nombre_resultante, nombre_variables):
     with open("process_files/" + archivo1, "r") as archivo1:
@@ -144,10 +178,11 @@ def aleacion(archivo1, nombre_resultante, nombre_variables):
                         final = f"{ultimo_id} {suma} {' '.join(valores[2:])}"
                         nuevo.write(final + "\n")
 
+
+
 def numerosiniciales(H,H2,nombre_variables,valor_x,valor_y,valor_z):
     x = y = z = 0
     permutaciones=[]
-    list2=[]
     semilla(2)
     N=0
     for x in range(-H2,H2+1):
@@ -157,21 +192,16 @@ def numerosiniciales(H,H2,nombre_variables,valor_x,valor_y,valor_z):
                 if h==H**2:
                     N=N+1
                     permutaciones.append((x,y,z))
-                    list2.append((valor_x,valor_y,valor_z))
-
-    for i in (permutaciones):
-        print(i[0],",",i[1],",",i[2]) # (-3,1,-1) < (valor_x,valor_y,valor_z)
-       # if i[0] < valor_x: 
-
-        
 
     variables = open("results/"+nombre_variables+".log", "a")
     random_seed = "Random Seed: "+str(2)+"\n"
     variables.write(random_seed)
     variables.close()
+    n_data = Casos_permutaciones(permutaciones,valor_x,valor_y,valor_z)
+    
+    return n_data
 
-    return permutaciones
-                                                                                                                                
+                                                                                                       
 def nocubicos(a,b,c,alpha,beta,gama):
     matriz = []
     matriz.append(a)
