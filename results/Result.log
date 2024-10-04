@@ -1,7 +1,11 @@
-Epsilon 1: 1.0
+Epsilon 1: 0.22
 Permutations: 4
 File 1: E1 > Values 
 Random Seed: 2
-Total Atoms: 1474192
+Total Atoms: 1008446
+Core File Percentage: 100.0%
+Shell File Percentage: 0.0%
+Random Seed: 2
+Total Atoms: 1479947
 Core File Percentage: 100.0%
 Shell File Percentage: 0.0%

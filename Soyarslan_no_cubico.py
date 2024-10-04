@@ -65,19 +65,14 @@ def Formula_menores(qi,archivo1,epsilon1,fi):
             datos.append(linea)
             if lineac == 6:
                 x = float(r[1].rstrip()) - float(r[0])
-                x=0
             elif lineac == 7:
                 y = float(r[1].rstrip()) - float(r[0])
             elif lineac == 8:
                 z = float(r[1].rstrip()) - float(r[0])
-                z=0
                 nocubico = nocubicos(x,y,z,90,90,90)
         elif lineac > 9:
             for j in range(n):
-                X_1 = qi[j][0]*((2*pi)/nocubico[0])*float(r[2])
-                Y_1 = qi[j][1]*((2*pi)/nocubico[1])*float(r[3])
-                Z_1 = qi[j][2]*((2*pi)/nocubico[2])*float(r[4])
-                valor += cos(( X_1 + ( Y_1 + ( Z_1 + fi[j]))))#fi
+                valor += cos((qi[j][0]*((2*pi)/nocubico[0])*float(r[2]) + (qi[j][1]*((2*pi)/nocubico[1])*float(r[3]) + (qi[j][2]*((2*pi)/nocubico[2])*float(r[4]) + fi[j]))))#fi
             norm = sqrt(2/n)
             valor = valor * norm
             if epsilon1 > valor:
@@ -96,7 +91,6 @@ def Formula_menores(qi,archivo1,epsilon1,fi):
 
     archivo.close()
     nuevo.close()
-
 
            
 
@@ -148,6 +142,38 @@ def aleacion(archivo1, nombre_resultante, nombre_variables):
 
             if final_primer_archivo:
                 nuevo.write("\n")
+""" def aleacion(archivo1, nombre_resultante, nombre_variables):
+    with open("process_files/" + archivo1, "r") as archivo1:
+            with open("results/" + nombre_resultante, "w") as nuevo:
+                contador1 = 0
+                tipo = 0
+                final_primer_archivo = False # Bandera para indicar el final del primer archivo
+                for linea in archivo1:
+                    contador1 += 1
+                    if contador1 == 4:
+                        cantidad_archivo1 = int(linea)
+                        cantidad_total = cantidad_archivo1
+                        variables = open("results/"+nombre_variables+".log", "a")
+                        variables.write("Total Atoms: " + str(cantidad_total)+"\n")
+                        variables.write("Core File Percentage: "+str(cantidad_archivo1*100/cantidad_total)+"\n")
+                        variables.close()
+                        nuevo.write(str(cantidad_total) + "\n")
+
+                    if contador1 <= 9 and contador1 != 4:
+                        if contador1 in (6,7,8):
+                            caja1 = linea.split()
+                            caja_mayor = caja1[0] + " " + caja1[1]
+                            nuevo.write(caja_mayor + "\n")
+                    if contador1 > 9:
+                        if tipo < (int(linea.split()[1])):
+                            tipo = (int(linea.split()[1]))
+                        nuevo.write(linea)
+                    if contador1 == 9:  
+                        final_primer_archivo = True
+
+                if final_primer_archivo:
+                    nuevo.write("\n")
+ """
 
 def func_calculos(permutaciones,valor_x,valor_y,valor_z):
     n_permutaciones=[]
@@ -226,14 +252,14 @@ def funcion_app(archivo1,epsilon1, simbolo, valor_permutaciones,nombre_resultant
         return ("Permutations",error)
     else:
         try:
-            if simbolo == ">":
+            if simbolo == "<":
                 try:
                     Formula_mayores(permutaciones,archivo1,epsilon1,fi)
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
                 aleacion("file1.dump",nombre_resultante,nombre_variables)
                 return("Complete","The file has been created successfully.\nResults saved in the 'results' folder.")
-            elif simbolo == "<":
+            elif simbolo == ">":
                 try:
                     Formula_menores(permutaciones,archivo1,epsilon1,fi)
                 except:
