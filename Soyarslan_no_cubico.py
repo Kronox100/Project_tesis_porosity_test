@@ -96,12 +96,64 @@ def Formula_menores(qi,archivo1,epsilon1,fi):
 
     archivo.close()
     nuevo.close()
-def Casos_permutaciones(permutaciones, valor_x, valor_y, valor_z):
-    n_data = []
-    for i in permutaciones:
-        x, y, z = i  # Desempaquetamos los valores de la tupla
-        print("DATOS:", x, ",", y, ",", z)  # Mostrar la tupla (x, y, z)
 
+
+           
+
+def aleacion(archivo1, nombre_resultante, nombre_variables):
+    with open("process_files/" + archivo1, "r") as archivo1:
+        with open("results/" + nombre_resultante, "w") as nuevo:
+            contador1 = 0
+            tipo = 0
+            final_primer_archivo = False  # Bandera para indicar el final del primer archivo
+            cantidad_archivo1 = 0
+            ultimo_id = 0
+            
+            for linea in archivo1:
+                contador1 += 1
+                if contador1 == 4:
+                    # Leer la cantidad de átomos en el archivo
+                    cantidad_archivo1 = int(linea)
+                    ultimo_id = cantidad_archivo1
+                    
+                    # Escribir las variables en el archivo de log
+                    with open("results/" + nombre_variables + ".log", "a") as variables:
+                        variables.write("Total Atoms: " + str(ultimo_id) + "\n")
+                        variables.write("Core File Percentage: 100.0%\n")
+                        variables.write("Shell File Percentage: 0.0%\n")
+                    
+                    # Escribir la cantidad total de átomos en el archivo nuevo
+                    nuevo.write(str(cantidad_archivo1) + "\n")
+
+                if contador1 <= 9 and contador1 != 4:
+                    # Procesar las líneas antes de la línea 9
+                    if contador1 in (6, 7, 8):
+                        caja1 = linea.split()
+                        caja_mayor = caja1[0] + " " + caja1[1]
+                        nuevo.write(caja_mayor + "\n")
+                    else:
+                        nuevo.write(linea)
+
+                if contador1 > 9:
+                    # Procesar las líneas a partir de la línea 10
+                    valores = linea.split()
+                    tipo_actual = int(valores[1])
+                    if tipo_actual > tipo:
+                        tipo = tipo_actual
+                    nuevo.write(linea)
+
+                if contador1 == 9:
+                    # Marcar el final del archivo para el procesado adicional
+                    final_primer_archivo = True
+
+            if final_primer_archivo:
+                nuevo.write("\n")
+
+def func_calculos(permutaciones,valor_x,valor_y,valor_z):
+    n_permutaciones=[]
+    i=0
+    for i in permutaciones:
+        x,y,z = i  # Desempaquetamos los valores de la tupla
         # Evaluar casos para X
         if x < valor_x:
             new_x = valor_x
@@ -109,7 +161,6 @@ def Casos_permutaciones(permutaciones, valor_x, valor_y, valor_z):
             new_x = x
         else:  # x == valor_x
             new_x = x
-
         # Evaluar casos para Y
         if y < valor_y:
             new_y = valor_y
@@ -117,7 +168,6 @@ def Casos_permutaciones(permutaciones, valor_x, valor_y, valor_z):
             new_y = y
         else:  # y == valor_y
             new_y = y
-
         # Evaluar casos para Z
         if z < valor_z:
             new_z = valor_z
@@ -126,59 +176,9 @@ def Casos_permutaciones(permutaciones, valor_x, valor_y, valor_z):
         else:  # z == valor_z
             new_z = z
 
-        # Añadimos el resultado final para esta tupla
-        n_data.append((new_x, new_y, new_z))
+        n_permutaciones.append((new_x,new_y,new_z))
 
-    return n_data
-           
-
-def aleacion(archivo1, nombre_resultante, nombre_variables):
-    with open("process_files/" + archivo1, "r") as archivo1:
-            with open("results/" + nombre_resultante, "w") as nuevo:
-                contador1 = 0
-                tipo = 0
-                final_primer_archivo = False # Bandera para indicar el final del primer archivo
-                for linea in archivo1:
-                    contador1 += 1
-                    if contador1 == 4:
-                        cantidad_archivo1 = int(linea)
-                        ultimo_id = int(linea)
-                    if contador1 == 6:
-                        caja2 = linea.split()
-                        break
-                    variables = open("results/"+nombre_variables +".log", "a")
-                    variables.write("Total Atoms: " + str(cantidad_archivo1)+"\n")
-                    variables.write("Core File Percentage: "+str(cantidad_archivo1*100/cantidad_archivo1)+"\n")
-                    variables.close()
-                    nuevo.write(str(cantidad_archivo1) + "\n")
-
-                    if contador1 <= 9 and contador1 != 4:
-                        if contador1 in (6,7,8):
-                            caja1 = linea.split()
-                            if float(caja1[1]) > float(caja2[1]):
-                                caja_mayor = caja1[0] + " " + caja1[1]
-                                nuevo.write(caja_mayor+"\n")
-                            else:
-                                caja_mayor = caja2[0] + " " + caja2[1]
-                                nuevo.write(caja_mayor+"\n")
-                        else:
-                            nuevo.write(linea)
-                    if contador1 > 9:
-                        if tipo < (int(linea.split()[1])):
-                            tipo = (int(linea.split()[1]))
-                        nuevo.write(linea)
-                    if contador1 == 9:  
-                        final_primer_archivo = True
-
-                if final_primer_archivo:
-                    if contador1 > 9:
-                        ultimo_id += 1
-                        valores = linea.split()
-                        suma = int(valores[1]) + tipo
-                        final = f"{ultimo_id} {suma} {' '.join(valores[2:])}"
-                        nuevo.write(final + "\n")
-
-
+    return n_permutaciones
 
 def numerosiniciales(H,H2,nombre_variables,valor_x,valor_y,valor_z):
     x = y = z = 0
@@ -193,13 +193,13 @@ def numerosiniciales(H,H2,nombre_variables,valor_x,valor_y,valor_z):
                     N=N+1
                     permutaciones.append((x,y,z))
 
+
     variables = open("results/"+nombre_variables+".log", "a")
     random_seed = "Random Seed: "+str(2)+"\n"
     variables.write(random_seed)
     variables.close()
-    n_data = Casos_permutaciones(permutaciones,valor_x,valor_y,valor_z)
-    
-    return n_data
+    n_permutaciones = func_calculos(permutaciones,valor_x,valor_y,valor_z)
+    return n_permutaciones
 
                                                                                                        
 def nocubicos(a,b,c,alpha,beta,gama):
@@ -215,7 +215,7 @@ def crear_fi(permutaciones):
     for i in range(0,n):
         fi.append(randfloat(0, 2*pi))
     return fi
-
+ 
 def funcion_app(archivo1,epsilon1, simbolo, valor_permutaciones,nombre_resultante, nombre_variables,valor_x,valor_y,valor_z):
     if not os.path.exists("process_files"):
             os.makedirs("process_files")
@@ -231,14 +231,14 @@ def funcion_app(archivo1,epsilon1, simbolo, valor_permutaciones,nombre_resultant
                     Formula_mayores(permutaciones,archivo1,epsilon1,fi)
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
-                aleacion("file1.dump", "file2.dump",nombre_resultante,nombre_variables)
+                aleacion("file1.dump",nombre_resultante,nombre_variables)
                 return("Complete","The file has been created successfully.\nResults saved in the 'results' folder.")
             elif simbolo == "<":
                 try:
                     Formula_menores(permutaciones,archivo1,epsilon1,fi)
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
-                aleacion("file1.dump", "file2.dump",nombre_resultante,nombre_variables)
+                aleacion("file1.dump",nombre_resultante,nombre_variables)
                 return("Complete","The file has been created successfully.\nResults saved in the 'results' folder.")
         except:
             return("Error in the Program")

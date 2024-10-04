@@ -281,7 +281,7 @@ class MainWindow(QWidget):
                 variables = open("results/"+nombre_variables+".log", "w")
                 variables.write(("Epsilon 1: " + str(epsilon1)) + "\n")
                 variables.write(("Permutations: " + str(valor_permutaciones)) + "\n")
-                variables.write(("Coords: " + "X: " + str(value_x) + "Y: " + str(value_y) + "Z: " + str(value_z) + "\n"))
+                #variables.write(("Coords: " + "X: " + str(value_x) + "Y: " + str(value_y) + "Z: " + str(value_z) + "\n"))
                 variables.write("File 1: E1 " + str(simbolo) + " Values \n")
                 variables.close()
 
@@ -303,7 +303,7 @@ class MainWindow(QWidget):
                 variables = open("results/variables.txt", "w")
                 variables.write(("Epsilon 1: " + str(epsilon1)) + "\n")
                 variables.write(("Permutations: " + str(valor_permutaciones)) + "\n")
-                variables.write(("Coords: " + "X: " + str(value_x) + "Y: " + str(value_y) + "Z: " + str(value_z) + "\n"))
+                #variables.write(("Coords: " + "X: " + str(value_x) + "Y: " + str(value_y) + "Z: " + str(value_z) + "\n"))
                 variables.write("File 1: E1 " + str(simbolo) + " Values \n")
                 variables.close()
 
