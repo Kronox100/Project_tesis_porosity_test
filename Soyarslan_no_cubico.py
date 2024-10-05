@@ -231,14 +231,14 @@ def funcion_app(archivo1,epsilon1, simbolo, valor_permutaciones,nombre_resultant
                     Formula_mayores(permutaciones,archivo1,epsilon1,fi)
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
-                aleacion("file1.dump", "file2.dump",nombre_resultante,nombre_variables)
+                aleacion("file1.dump",nombre_resultante,nombre_variables)
                 return("Complete","The file has been created successfully.\nResults saved in the 'results' folder.")
             elif simbolo == "<":
                 try:
                     Formula_menores(permutaciones,archivo1,epsilon1,fi)
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
-                aleacion("file1.dump", "file2.dump",nombre_resultante,nombre_variables)
+                aleacion("file1.dump", nombre_resultante,nombre_variables)
                 return("Complete","The file has been created successfully.\nResults saved in the 'results' folder.")
         except:
             return("Error in the Program")
