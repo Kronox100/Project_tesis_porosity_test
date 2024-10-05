@@ -43,7 +43,7 @@ def Formula_mayores(qi,archivo1,epsilon1,fi):
             if i != len(datos) - 1:
                 nuevo.write("\n")
 
-
+    print("datos_n",len(datos))
     archivo.close()
     nuevo.close()
 
@@ -88,7 +88,7 @@ def Formula_menores(qi,archivo1,epsilon1,fi):
             if i != len(datos) - 1:
                 nuevo.write("\n")
 
-
+    print("datos_n",n)
     archivo.close()
     nuevo.close()
 
@@ -142,71 +142,19 @@ def aleacion(archivo1, nombre_resultante, nombre_variables):
 
             if final_primer_archivo:
                 nuevo.write("\n")
-""" def aleacion(archivo1, nombre_resultante, nombre_variables):
-    with open("process_files/" + archivo1, "r") as archivo1:
-            with open("results/" + nombre_resultante, "w") as nuevo:
-                contador1 = 0
-                tipo = 0
-                final_primer_archivo = False # Bandera para indicar el final del primer archivo
-                for linea in archivo1:
-                    contador1 += 1
-                    if contador1 == 4:
-                        cantidad_archivo1 = int(linea)
-                        cantidad_total = cantidad_archivo1
-                        variables = open("results/"+nombre_variables+".log", "a")
-                        variables.write("Total Atoms: " + str(cantidad_total)+"\n")
-                        variables.write("Core File Percentage: "+str(cantidad_archivo1*100/cantidad_total)+"\n")
-                        variables.close()
-                        nuevo.write(str(cantidad_total) + "\n")
 
-                    if contador1 <= 9 and contador1 != 4:
-                        if contador1 in (6,7,8):
-                            caja1 = linea.split()
-                            caja_mayor = caja1[0] + " " + caja1[1]
-                            nuevo.write(caja_mayor + "\n")
-                    if contador1 > 9:
-                        if tipo < (int(linea.split()[1])):
-                            tipo = (int(linea.split()[1]))
-                        nuevo.write(linea)
-                    if contador1 == 9:  
-                        final_primer_archivo = True
-
-                if final_primer_archivo:
-                    nuevo.write("\n")
+""" def func_calculos(permutaciones, valor_x, valor_y, valor_z):
+    # Hacemos una copia para iterar de forma segura
+    for tupla in permutaciones[:]:
+        x, y, z = tupla
+        # Eliminar la tupla si cualquier valor es menor al umbral
+        if x < valor_x or y < valor_y or z < valor_z:
+            permutaciones.remove(tupla)
+    return permutaciones
  """
 
-def func_calculos(permutaciones,valor_x,valor_y,valor_z):
-    n_permutaciones=[]
-    i=0
-    for i in permutaciones:
-        x,y,z = i  # Desempaquetamos los valores de la tupla
-        # Evaluar casos para X
-        if x < valor_x:
-            new_x = valor_x
-        elif x > valor_x:
-            new_x = x
-        else:  # x == valor_x
-            new_x = x
-        # Evaluar casos para Y
-        if y < valor_y:
-            new_y = valor_y
-        elif y > valor_y:
-            new_y = y
-        else:  # y == valor_y
-            new_y = y
-        # Evaluar casos para Z
-        if z < valor_z:
-            new_z = valor_z
-        elif z > valor_z:
-            new_z = z
-        else:  # z == valor_z
-            new_z = z
 
-        n_permutaciones.append((new_x,new_y,new_z))
-
-    return n_permutaciones
-
-def numerosiniciales(H,H2,nombre_variables,valor_x,valor_y,valor_z):
+def numerosiniciales(H,H2,nombre_variables):
     x = y = z = 0
     permutaciones=[]
     semilla(2)
@@ -224,8 +172,7 @@ def numerosiniciales(H,H2,nombre_variables,valor_x,valor_y,valor_z):
     random_seed = "Random Seed: "+str(2)+"\n"
     variables.write(random_seed)
     variables.close()
-    n_permutaciones = func_calculos(permutaciones,valor_x,valor_y,valor_z)
-    return n_permutaciones
+    return permutaciones
 
                                                                                                        
 def nocubicos(a,b,c,alpha,beta,gama):
@@ -245,7 +192,7 @@ def crear_fi(permutaciones):
 def funcion_app(archivo1,epsilon1, simbolo, valor_permutaciones,nombre_resultante, nombre_variables,valor_x,valor_y,valor_z):
     if not os.path.exists("process_files"):
             os.makedirs("process_files")
-    permutaciones = numerosiniciales(sqrt(valor_permutaciones),valor_permutaciones, nombre_variables,valor_x,valor_y,valor_z)
+    permutaciones = numerosiniciales(sqrt(valor_permutaciones),valor_permutaciones, nombre_variables)
     fi = crear_fi(permutaciones)
     if permutaciones == []:
         error = "Error in Permutations\nThere is no combination for:\n"+str(valor_permutaciones)+" = x^2 + y^2 + z^2"
@@ -254,16 +201,20 @@ def funcion_app(archivo1,epsilon1, simbolo, valor_permutaciones,nombre_resultant
         try:
             if simbolo == "<":
                 try:
-                    Formula_mayores(permutaciones,archivo1,epsilon1,fi)
+                    print(len(permutaciones))
+                    resultado = [t for t in permutaciones if t[0] >= valor_x and t[1] >= valor_y and t[2] >= valor_z]
+                    Formula_mayores(resultado,archivo1,epsilon1,fi)
                 except:
-                    return("File 1","Error in File 1\nIncorrect Format")
+                    return("File 1","Error in File 1\nIncorret Value or Format")
                 aleacion("file1.dump",nombre_resultante,nombre_variables)
                 return("Complete","The file has been created successfully.\nResults saved in the 'results' folder.")
             elif simbolo == ">":
                 try:
-                    Formula_menores(permutaciones,archivo1,epsilon1,fi)
+                    print(len(permutaciones))
+                    resultado = [t for t in permutaciones if t[0] <= valor_x and t[1] <= valor_y and t[2] <= valor_z]
+                    Formula_menores(resultado,archivo1,epsilon1,fi)
                 except:
-                    return("File 1","Error in File 1\nIncorrect Format")
+                    return("File 1","Error in File 1\nIncorrect Value or Format")
                 aleacion("file1.dump",nombre_resultante,nombre_variables)
                 return("Complete","The file has been created successfully.\nResults saved in the 'results' folder.")
         except:
