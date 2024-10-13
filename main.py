@@ -2,28 +2,35 @@ import sys
 import os
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QMessageBox, QFileDialog, QFrame, QProgressDialog
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
-import Soyarslan_no_cubico
+import Soyarslan_no_cubico as Soyarslan_no_cubico
 
 from PyQt6.QtCore import QThread, pyqtSignal
-import Soyarslan_no_cubico
+import Soyarslan_no_cubico as Soyarslan_no_cubico
 
 class MyThread(QThread):
     resultado_signal = pyqtSignal(tuple)
 
-    def __init__(self, archivo1, epsilon1, simbolo , valor_permutaciones, nombre_resultante,nombre_variables,valor_x,valor_y,valor_z):
+    def __init__(self, archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2, nombre_resultante,nombre_resultante2,nombre_variables,value_x,value_y,value_z,value_x2,value_y2,value_z2):
         super().__init__()
         self.archivo1 = archivo1
         self.epsilon1 = epsilon1
-        self.simbolo = simbolo
-        self.valor_x = valor_x
-        self.valor_y = valor_y
-        self.valor_z = valor_z
-        self.valor_permutaciones = valor_permutaciones
+        self.epsilon2 = epsilon2
+        self.simbolo1 = simbolo1
+        self.simbolo2 = simbolo2
+        self.valor_x = value_x
+        self.valor_y = value_y
+        self.valor_z = value_z
+        self.valor_x2 = value_x2
+        self.valor_y2 = value_y2
+        self.valor_z2 = value_z2
+        self.valor_permutacionesE1 = valor_permutacionesE1
+        self.valor_permutacionesE2 = valor_permutacionesE2
         self.nombre_resultante = nombre_resultante
+        self.nombre_resultante2 = nombre_resultante2
         self.nombre_variables = nombre_variables
 
     def run(self):
-        resultado = Soyarslan_no_cubico.funcion_app(self.archivo1,self.epsilon1, self.simbolo, self.valor_permutaciones, self.nombre_resultante, self.nombre_variables,self.valor_x,self.valor_y,self.valor_z)
+        resultado = Soyarslan_no_cubico.funcion_app(self.archivo1, self.epsilon1,self.epsilon2, self.simbolo1,self.simbolo2 , self.valor_permutacionesE1,self.valor_permutacionesE2, self.nombre_resultante,self.nombre_resultante2,self.nombre_variables,self.valor_x,self.valor_y,self.valor_z,self.valor_x2,self.valor_y2,self.valor_z2)
         self.resultado_signal.emit(resultado)
 
 class MainWindow(QWidget):
@@ -93,6 +100,12 @@ class MainWindow(QWidget):
         layout1.addWidget(archivo1_entry)
         layout1.addWidget(boton_explorar1)
 
+        
+        layout_seccion1.addLayout(layout1)
+
+        # Sección 2: Archivo 2 y Epsilon 2, agregar X Y Z
+        layout_seccion2 = QVBoxLayout()
+
         layout2 = QHBoxLayout()
         layout2.setAlignment(Qt.AlignmentFlag.AlignLeft)
         label_epsilon1 = QLabel("E1:")
@@ -112,12 +125,6 @@ class MainWindow(QWidget):
         layout2.addWidget(epsilon1_entry)
         layout2.addWidget(boton_simbolo)
         layout2.addWidget(label_valores1)
-
-        layout_seccion1.addLayout(layout1)
-        layout_seccion1.addLayout(layout2)
-
-        # Sección 2: Archivo 2 y Epsilon 2, agregar X Y Z
-        layout_seccion2 = QVBoxLayout()
 
         layout3 = QHBoxLayout()
         layout3.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -159,49 +166,141 @@ class MainWindow(QWidget):
         layout4.addWidget(label_Z)
         layout4.addWidget(Z_entry)
 
+        layout_seccion2.addLayout(layout2)
         layout_seccion2.addLayout(layout3)
         layout_seccion2.addLayout(layout4)
+
+        #NUEVA FUNCION
+        layout_f2 = QVBoxLayout()
+
+        F2_layout = QHBoxLayout()
+        F2_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        label_E2 = QLabel("E2:")
+        label_E2.setStyleSheet(letra)
+        label_E2.setFixedSize(52,36)
+        E2_entry = QLineEdit()
+        E2_entry.setStyleSheet(borde_entry)
+        E2_entry.setFixedSize(100,36)
+        btn_Simbolo2 = QPushButton("<")
+        btn_Simbolo2.clicked.connect(lambda: self.alternar_simbolo(btn_Simbolo2, btn_Simbolo2))
+        btn_Simbolo2.setStyleSheet(botones)
+        btn_Simbolo2.setFixedSize(36,36)
+        label_valores1 = QLabel("Values")
+        label_valores1.setStyleSheet(letra)
+        label_valores1.setFixedSize(81,36)
+        F2_layout.addWidget(label_E2)
+        F2_layout.addWidget(E2_entry)
+        F2_layout.addWidget(btn_Simbolo2)
+        F2_layout.addWidget(label_valores1)
+
+        F2_Coords = QHBoxLayout()
+        F2_Coords.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        F2_Label_Coords = QLabel("Coords:")
+        F2_Label_Coords.setStyleSheet(letra)
+        F2_Label_Coords.setFixedSize(106,36)
+        F2_Coords.addWidget(F2_Label_Coords)
+
+        F2_CoordsXYZ = QHBoxLayout()
+        F2_CoordsXYZ.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        X2_Label = QLabel("X:")
+        X2_Label.setStyleSheet(letra)
+        X2_Label.setFixedSize(52,36)
+        Y2_Label = QLabel("Y:")
+        Y2_Label.setStyleSheet(letra)
+        Y2_Label.setFixedSize(52,36)
+        Z2_Label = QLabel("Z:")
+        Z2_Label.setStyleSheet(letra)
+        Z2_Label.setFixedSize(52,36)
+        X2_entry = QLineEdit()
+        X2_entry.setStyleSheet(borde_entry)
+        X2_entry.setFixedSize(100,36)
+        Y2_entry = QLineEdit()
+        Y2_entry.setStyleSheet(borde_entry)
+        Y2_entry.setFixedSize(100,36)
+        Z2_entry = QLineEdit()
+        Z2_entry.setStyleSheet(borde_entry)
+        Z2_entry.setFixedSize(100,36)
+        label_valueE2 = QLabel("E2")
+        E2_entry.textChanged.connect(lambda: self.actualizar_valor_epsilon2(E2_entry, label_valueE2))
+        label_valueE2.setStyleSheet(letra)
+        label_valueE2.setFixedSize(105,36)
+        F2_CoordsXYZ.addWidget(X2_Label)
+        F2_CoordsXYZ.addWidget(X2_entry)
+        F2_CoordsXYZ.addWidget(Y2_Label)
+        F2_CoordsXYZ.addWidget(Y2_entry)
+        F2_CoordsXYZ.addWidget(Z2_Label)
+        F2_CoordsXYZ.addWidget(Z2_entry)
+
+        layout_f2.addLayout(F2_layout)
+        layout_f2.addLayout(F2_Coords)
+        layout_f2.addLayout(F2_CoordsXYZ)
 
         # Sección 3: Permutaciones y Nombre Resultado
         layout_seccion3 = QVBoxLayout()
 
-        layout5 = QHBoxLayout()
-        layout5.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        label_permutaciones = QLabel("Permutations:")
-        label_permutaciones.setStyleSheet(letra)
-        label_permutaciones.setFixedSize(141,36)
-        permutaciones_entry = QLineEdit()
-        permutaciones_entry.setStyleSheet(borde_entry)
-        permutaciones_entry.setFixedSize(100,36)
-        layout5.addWidget(label_permutaciones)
-        layout5.addWidget(permutaciones_entry)
+        permut1_layout = QHBoxLayout()
+        permut1_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        label_permutacion = QLabel("Permutations F1:")
+        label_permutacion.setStyleSheet(letra)
+        label_permutacion.setFixedSize(178,36)
+        entry_permutacion = QLineEdit()
+        entry_permutacion.setStyleSheet(borde_entry)
+        entry_permutacion.setFixedSize(100,36)
 
-        layout6 = QHBoxLayout()
-        layout6.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        label_nombre_archivo = QLabel("Output File Name:")
+        permut2_layout = QHBoxLayout()
+        permut2_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        Label_2permutacion = QLabel("Permutations F2:")
+        Label_2permutacion.setStyleSheet(letra)
+        Label_2permutacion.setFixedSize(178,36)
+        entry_2permutacion = QLineEdit()
+        entry_2permutacion.setStyleSheet(borde_entry)
+        entry_2permutacion.setFixedSize(100,36)
+
+        permut1_layout.addWidget(label_permutacion)
+        permut1_layout.addWidget(entry_permutacion)
+        permut2_layout.addWidget(Label_2permutacion)
+        permut2_layout.addWidget(entry_2permutacion)
+
+        layout_1stOut = QHBoxLayout()
+        layout_1stOut.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        label_nombre_archivo = QLabel("Output File 1 Name:")
         label_nombre_archivo.setStyleSheet(letra)
-        label_nombre_archivo.setFixedSize(178,36)
-        nombre_archivo_entry = QLineEdit("Result")
+        label_nombre_archivo.setFixedSize(190,36)
+        nombre_archivo_entry = QLineEdit("Result 1")
         nombre_archivo_entry.setStyleSheet(borde_entry)
-        nombre_archivo_entry.setFixedSize(160,36)
-        layout6.addWidget(label_nombre_archivo)
-        layout6.addWidget(nombre_archivo_entry)
+        nombre_archivo_entry.setFixedSize(190,36)
+
+        layout_2ndOut = QHBoxLayout()
+        layout_2ndOut.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        label2nd_Outarchivo = QLabel("Output File 2 Name:")
+        label2nd_Outarchivo.setStyleSheet(letra)
+        label2nd_Outarchivo.setFixedSize(190,36)
+        nombre_2ndResult = QLineEdit("Result 2")
+        nombre_2ndResult.setStyleSheet(borde_entry)
+        nombre_2ndResult.setFixedSize(190,36)
+        layout_1stOut.addWidget(label_nombre_archivo)
+        layout_1stOut.addWidget(nombre_archivo_entry)
+        layout_2ndOut.addWidget(label2nd_Outarchivo)
+        layout_2ndOut.addWidget(nombre_2ndResult)
 
         layout7 = QHBoxLayout()
         boton_confirmar = QPushButton("Confirm")
-        boton_confirmar.clicked.connect(lambda: self.confirmar(archivo1_entry, epsilon1_entry, boton_simbolo, permutaciones_entry, nombre_archivo_entry,X_entry, Y_entry,Z_entry))
+        boton_confirmar.clicked.connect(lambda: self.confirmar(archivo1_entry, epsilon1_entry,E2_entry,boton_simbolo,btn_Simbolo2, entry_permutacion,entry_2permutacion, nombre_archivo_entry,X_entry, Y_entry,Z_entry,X2_entry, Y2_entry,Z2_entry))
         boton_confirmar.setStyleSheet(botones_confirmar)
         boton_confirmar.setFixedSize(98,36)
         layout7.addWidget(boton_confirmar)
 
-        layout_seccion3.addLayout(layout5)
-        layout_seccion3.addLayout(layout6)
+        layout_seccion3.addLayout(permut1_layout)
+        layout_seccion3.addLayout(permut2_layout)
+        layout_seccion3.addLayout(layout_1stOut)
+        layout_seccion3.addLayout(layout_2ndOut)
         layout_seccion3.addLayout(layout7)
 
         layout_principal.addLayout(layout_titulo)
         layout_principal.addLayout(layout_sub_titulo)
         agregar_seccion(layout_seccion1)
         agregar_seccion(layout_seccion2)
+        agregar_seccion(layout_f2)
         agregar_seccion(layout_seccion3)
 
     def seleccionar_archivo(self, entry):
@@ -222,7 +321,14 @@ class MainWindow(QWidget):
         else:
             label_valor_epsilon1.setText("E1")
 
-    def confirmar(self,archivo1_entry, epsilon1_entry, boton_simbolo, permutaciones_entry, nombre_archivo_entry,valor_x_entry, valor_y_entry,valor_z_entry):
+    def actualizar_valor_epsilon2(self,epsilon1_entry, label_valor_epsilon1):
+        text = epsilon1_entry.text()
+        if text:
+            label_valor_epsilon1.setText(text)
+        else:
+            label_valor_epsilon1.setText("E2")
+
+    def confirmar(self,archivo1_entry, epsilon1_entry,E2_entry,boton_simbolo,btn_Simbolo2, entry_permutacion,entry_2permutacion, nombre_archivo_entry,X_entry, Y_entry,Z_entry,X2_entry, Y2_entry,Z2_entry):
         mensaje = QMessageBox()
         mensaje.setWindowTitle("Confirmation")
         mensaje.setText("The data is correct?")
@@ -233,11 +339,11 @@ class MainWindow(QWidget):
         reply = mensaje.exec()
         if reply == QMessageBox.StandardButton.Yes:
             print("The operation was confirmed")
-            self.confirmar_operacion(archivo1_entry, epsilon1_entry, boton_simbolo, permutaciones_entry, nombre_archivo_entry,valor_x_entry, valor_y_entry,valor_z_entry)
+            self.confirmar_operacion(archivo1_entry, epsilon1_entry,E2_entry,boton_simbolo,btn_Simbolo2, entry_permutacion,entry_2permutacion, nombre_archivo_entry,X_entry, Y_entry,Z_entry,X2_entry, Y2_entry,Z2_entry)
         else:
             print("The operation was canceled")
 
-    def confirmar_operacion(self,archivo1_var, epsilon1_var, simbolo_var, permutaciones_var, nombre_archivo,valor_x_var, valor_y_var,valor_z_var):
+    def confirmar_operacion(self,archivo1_var, E1_var,E2_var, boton_simbolo_var,btn_Simbolo2_var, entry_permutacion_var, entry_2permutacion, nombre_archivo_entry,valor_x_var,valor_y_var,valor_z_var,valor_x2_var,valor_y2_var,valor_z2_var):
         if not os.path.exists("results"):
             os.makedirs("results")
         try:
@@ -249,40 +355,50 @@ class MainWindow(QWidget):
             QMessageBox.information(None, "File 1", "Incorrect File 1 Format")
             return
         try:
-            epsilon1 = float(epsilon1_var.text())
+            epsilon1 = float(E1_var.text())
+            epsilon2 = float(E2_var.text())
         except:
             QMessageBox.information(None, "Epsilon 1", "Incorrect Epsilon 1 Format")
             return
         try:
-            valor_permutaciones = int(permutaciones_var.text())
+            valor_permutacionesE1 = int(entry_permutacion_var.text())
+            valor_permutacionesE2 = int(entry_2permutacion.text())
         except:
             QMessageBox.information(None, "Permutations", "Incorrect Permutations Format")
             return
         try:
             value_x = float(valor_x_var.text())
+            value_x2 = float(valor_x2_var.text())
         except:
             QMessageBox.information(None, "X", "Incorrect Coord Format")
             return
         try:
             value_y = float(valor_y_var.text())
+            value_y2 = float(valor_y2_var.text())
         except:
             QMessageBox.information(None, "Y", "Incorrect Coord Format")
             return
         try:
             value_z = float(valor_z_var.text())
+            value_z2 = float(valor_z2_var.text())
         except:
             QMessageBox.information(None, "Z", "Incorrect Coord Format")
             return
-        simbolo = str(simbolo_var.text())
-        nombre_variables = str(nombre_archivo.text())
-        nombre_resultante = str(nombre_archivo.text() + ".dump")
-        if simbolo == ">":
-            if epsilon1 != "" and value_x !="" and value_y != "" and value_z != "" :
+        simbolo1 = str(boton_simbolo_var.text())
+        simbolo2 = str(btn_Simbolo2_var.text())
+        nombre_variables = str(nombre_archivo_entry.text())
+        nombre_resultante = str(nombre_archivo_entry.text() + "_1.dump")
+        nombre_resultante2 = str(nombre_archivo_entry.text() + "_2.dump")
+
+        if simbolo1 == ">" and simbolo2 == ">":
+            if epsilon1 != "" and epsilon2 != "" and value_x !="" and value_y != "" and value_z != "" and value_z2 != "" and value_y2 != "" and value_x2 != "":
                 variables = open("results/"+nombre_variables+".log", "w")
                 variables.write(("Epsilon 1: " + str(epsilon1)) + "\n")
-                variables.write(("Permutations: " + str(valor_permutaciones)) + "\n")
-                #variables.write(("Coords: " + "X: " + str(value_x) + "Y: " + str(value_y) + "Z: " + str(value_z) + "\n"))
-                variables.write("File 1: E1 " + str(simbolo) + " Values \n")
+                variables.write(("Epsilon 2: " + str(epsilon2)) + "\n")
+                variables.write(("Permutations 1: " + str(valor_permutacionesE1)) + "\n")
+                variables.write(("Permutations 2: " + str(valor_permutacionesE2)) + "\n")
+                variables.write("File 1: E1 " + str(simbolo1) + " Values \n")
+                variables.write("File 2: E2 " + str(simbolo2) + " Values \n")
                 variables.close()
 
                 # Ventana Informativa
@@ -293,18 +409,21 @@ class MainWindow(QWidget):
                 self.ventana_procesando.show()
 
                 # Proceso en otro hilo
-                self.thread = MyThread(archivo1, epsilon1, simbolo , valor_permutaciones, nombre_resultante,nombre_variables,value_x,value_y,value_z)
+                self.thread = MyThread(archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2, 
+                                        nombre_resultante,nombre_resultante2,nombre_variables,value_x,value_y,value_z,value_x2,value_y2,value_z2)
                 self.thread.resultado_signal.connect(self.show_result)
                 self.thread.start()
             else:
                 QMessageBox.information(None, "", "Epsilon 1, X, Y and Z must have data")
-        elif simbolo == "<":
-            if epsilon1 != "" and value_x !="" and value_y != "" and value_z != "" :
-                variables = open("results/variables.txt", "w")
+        elif simbolo1 == ">" and simbolo2 == "<":
+            if epsilon1 != "" and epsilon2 != "" and value_x !="" and value_y != "" and value_z != "" and value_z2 != "" and value_y2 != "" and value_x2 != "":
+                variables = open("results/"+nombre_variables+".log", "w")
                 variables.write(("Epsilon 1: " + str(epsilon1)) + "\n")
-                variables.write(("Permutations: " + str(valor_permutaciones)) + "\n")
-                #variables.write(("Coords: " + "X: " + str(value_x) + "Y: " + str(value_y) + "Z: " + str(value_z) + "\n"))
-                variables.write("File 1: E1 " + str(simbolo) + " Values \n")
+                variables.write(("Epsilon 2: " + str(epsilon2)) + "\n")
+                variables.write(("Permutations 1: " + str(valor_permutacionesE1)) + "\n")
+                variables.write(("Permutations 2: " + str(valor_permutacionesE2)) + "\n")
+                variables.write("File 1: E1 " + str(simbolo1) + " Values \n")
+                variables.write("File 2: E2 " + str(simbolo2) + " Values \n")
                 variables.close()
 
                 # Ventana Informativa
@@ -315,7 +434,58 @@ class MainWindow(QWidget):
                 self.ventana_procesando.show()
 
                 # Proceso en otro hilo
-                self.thread = MyThread(archivo1, epsilon1, simbolo , valor_permutaciones, nombre_resultante,nombre_variables,value_x,value_y,value_z)
+                self.thread = MyThread(archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2, 
+                                        nombre_resultante,nombre_resultante2,nombre_variables,value_x,value_y,value_z,value_x2,value_y2,value_z2)
+                self.thread.resultado_signal.connect(self.show_result)
+                self.thread.start()
+            else:
+                QMessageBox.information(None, "", "Epsilon 1, X, Y and Z must have data")
+        elif simbolo1 == "<" and simbolo2 == ">":
+            if epsilon1 != "" and epsilon2 != "" and value_x !="" and value_y != "" and value_z != "" and value_z2 != "" and value_y2 != "" and value_x2 != "":
+                variables = open("results/"+nombre_variables+".log", "w")
+                variables.write(("Epsilon 1: " + str(epsilon1)) + "\n")
+                variables.write(("Epsilon 2: " + str(epsilon2)) + "\n")
+                variables.write(("Permutations 1: " + str(valor_permutacionesE1)) + "\n")
+                variables.write(("Permutations 2: " + str(valor_permutacionesE2)) + "\n")
+                variables.write("File 1: E1 " + str(simbolo1) + " Values \n")
+                variables.write("File 2: E2 " + str(simbolo2) + " Values \n")
+                variables.close()
+
+                # Ventana Informativa
+                self.ventana_procesando = QMessageBox(self)
+                self.ventana_procesando.setStandardButtons(QMessageBox.StandardButton.NoButton)
+                self.ventana_procesando.setText("Processing...\nPlease, Wait")
+                self.ventana_procesando.setStyleSheet("background: white; font-family: Arial; font-size: 12pt; font-weight: bold;color: black;")
+                self.ventana_procesando.show()
+
+                # Proceso en otro hilo
+                self.thread = MyThread(archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2, 
+                                        nombre_resultante,nombre_resultante2,nombre_variables,value_x,value_y,value_z,value_x2,value_y2,value_z2)
+                self.thread.resultado_signal.connect(self.show_result)
+                self.thread.start()
+            else:
+                QMessageBox.information(None, "", "Epsilon 1, X, Y and Z must have data")
+        elif simbolo1 == "<" and simbolo2 == "<":
+            if epsilon1 != "" and epsilon2 != "" and value_x !="" and value_y != "" and value_z != "" and value_z2 != "" and value_y2 != "" and value_x2 != "":
+                variables = open("results/"+nombre_variables+".log", "w")
+                variables.write(("Epsilon 1: " + str(epsilon1)) + "\n")
+                variables.write(("Epsilon 2: " + str(epsilon2)) + "\n")
+                variables.write(("Permutations 1: " + str(valor_permutacionesE1)) + "\n")
+                variables.write(("Permutations 2: " + str(valor_permutacionesE2)) + "\n")
+                variables.write("File 1: E1 " + str(simbolo1) + " Values \n")
+                variables.write("File 2: E2 " + str(simbolo2) + " Values \n")
+                variables.close()
+
+                # Ventana Informativa
+                self.ventana_procesando = QMessageBox(self)
+                self.ventana_procesando.setStandardButtons(QMessageBox.StandardButton.NoButton)
+                self.ventana_procesando.setText("Processing...\nPlease, Wait")
+                self.ventana_procesando.setStyleSheet("background: white; font-family: Arial; font-size: 12pt; font-weight: bold;color: black;")
+                self.ventana_procesando.show()
+
+                # Proceso en otro hilo
+                self.thread = MyThread(archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2, 
+                                        nombre_resultante,nombre_resultante2,nombre_variables,value_x,value_y,value_z,value_x2,value_y2,value_z2)
                 self.thread.resultado_signal.connect(self.show_result)
                 self.thread.start()
             else:

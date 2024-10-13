@@ -43,6 +43,49 @@ def Formula_mayores(qi,archivo1,epsilon1,fi):
             if i != len(datos) - 1:
                 nuevo.write("\n")
 
+    archivo.close()
+    nuevo.close()
+
+def Formula_mayores2(qi,archivo1,epsilon1,fi):
+    archivo = open(archivo1, "r")
+    nuevo = open("process_files/file2.dump", "w")
+    x =y=z = 0
+    lineac = 0
+    datos =[]
+    nocubico = []
+    ID = 0
+    n = len(qi)
+    for linea in archivo:
+        lineac += 1
+        valor = 0
+        r = linea.split(" ")
+        if lineac < 10:
+            datos.append(linea)
+            if lineac == 6:
+                x = float(r[1].rstrip()) - float(r[0])
+            elif lineac == 7:
+                y = float(r[1].rstrip()) - float(r[0])
+            elif lineac == 8:
+                z = float(r[1].rstrip()) - float(r[0])
+                nocubico = nocubicos(x,y,z,90,90,90)
+        elif lineac > 9:
+            for j in range(n):
+                valor += cos((qi[j][0]*((2*pi)/nocubico[0])*float(r[2]) + (qi[j][1]*((2*pi)/nocubico[1])*float(r[3]) + (qi[j][2]*((2*pi)/nocubico[2])*float(r[4]) + fi[j]))))#fi
+            norm = sqrt(2/n)
+            valor = valor * norm   
+            if epsilon1 < valor:
+                ID += 1
+                texto = f"{ID} {r[1]} {r[2]} {r[3]} {r[4]}"
+                datos.append(texto)
+    datos[3] = str(ID) + "\n"
+    for i in range(0, len(datos)):
+        if i<9:
+            nuevo.write(datos[i])
+        else:
+            nuevo.write(datos[i].rstrip())
+            if i != len(datos) - 1:
+                nuevo.write("\n")
+
 
     archivo.close()
     nuevo.close()
@@ -51,6 +94,49 @@ def Formula_mayores(qi,archivo1,epsilon1,fi):
 def Formula_menores(qi,archivo1,epsilon1,fi):
     archivo = open(archivo1, "r")
     nuevo = open("process_files/file1.dump", "w")
+    x =y=z = 0
+    lineac = 0
+    datos =[]
+    nocubico = []
+    ID = 0
+    n = len(qi)
+    for linea in archivo:
+        lineac += 1
+        valor = 0
+        r = linea.split(" ")
+        if lineac < 10:
+            datos.append(linea)
+            if lineac == 6:
+                x = float(r[1].rstrip()) - float(r[0])
+            elif lineac == 7:
+                y = float(r[1].rstrip()) - float(r[0])
+            elif lineac == 8:
+                z = float(r[1].rstrip()) - float(r[0])
+                nocubico = nocubicos(x,y,z,90,90,90)
+        elif lineac > 9:
+            for j in range(n):
+                valor += cos((qi[j][0]*((2*pi)/nocubico[0])*float(r[2]) + (qi[j][1]*((2*pi)/nocubico[1])*float(r[3]) + (qi[j][2]*((2*pi)/nocubico[2])*float(r[4]) + fi[j]))))#fi
+            norm = sqrt(2/n)
+            valor = valor * norm
+            if epsilon1 > valor:
+                ID += 1
+                texto = f"{ID} {r[1]} {r[2]} {r[3]} {r[4]}"
+                datos.append(texto)
+    datos[3] = str(ID) + "\n"
+    for i in range(0, len(datos)):
+        if i<9:
+            nuevo.write(datos[i])
+        else:
+            nuevo.write(datos[i].rstrip())
+            if i != len(datos) - 1:
+                nuevo.write("\n")
+
+    archivo.close()
+    nuevo.close()
+
+def Formula_menores2(qi,archivo1,epsilon1,fi):
+    archivo = open(archivo1, "r")
+    nuevo = open("process_files/file2.dump", "w")
     x =y=z = 0
     lineac = 0
     datos =[]
@@ -142,20 +228,23 @@ def aleacion(archivo1, nombre_resultante, nombre_variables):
             if final_primer_archivo:
                 nuevo.write("\n")
 
-def func_calculos(permutaciones,valor_x,valor_y,valor_z,simbolo):
+def calcular_con_operadores(permutaciones2, valor_x2, valor_y2, valor_z2, operador_menor):
+    # Filtra las tuplas según el operador menor
+    if operador_menor == "<":
+        resultado = [p for p in permutaciones2 if p[0] <= valor_x2 and p[1] <= valor_y2 and p[2] <= valor_z2]
+    elif operador_menor == ">":
+        resultado = [p for p in permutaciones2 if p[0] >= valor_x2 and p[1] >= valor_y2 and p[2] >= valor_z2]
+    else:
+        raise ValueError("Operador mayor no válido. Use '<','>'")
 
-   matriz_filtrada = []
-   for i in permutaciones:
-        x, y, z = i
-        if simbolo == ">":
-            if x >= valor_x or y >= valor_y or z >= valor_z:
-                matriz_filtrada.append(i)
-        elif simbolo == "<":
-            if x <= valor_x or y <= valor_y or z <= valor_z:
-                matriz_filtrada.append(i)
-        else:
-            raise ValueError("Condición no válida")
-   return matriz_filtrada
+    # Si los resultados están vacíos, devuelve [(0, 0, 0)]
+    resultado = resultado if resultado else [(0, 0, 0)]
+    return resultado
+
+
+
+    # Si los resultados están vacíos, devuelve [(0, 0, 0)]
+
 
 def numerosiniciales(H,H2,nombre_variables,valor_x,valor_y,valor_z,simbolo):
     x = y = z = 0
@@ -172,13 +261,13 @@ def numerosiniciales(H,H2,nombre_variables,valor_x,valor_y,valor_z,simbolo):
                     permutaciones.append((x,y,z))
 
 
-    variables = open("results/"+nombre_variables+".log", "a")
+    variables = open("results/"+nombre_variables+"1_.log", "a")
     random_seed = "Random Seed: "+str(2)+"\n"
     variables.write(random_seed)
     variables.close()
-    n_permutaciones = func_calculos(permutaciones,valor_x,valor_y,valor_z,simbolo)
-    print("LAVOLA", n_permutaciones)
+    n_permutaciones = calcular_con_operadores(permutaciones,valor_x,valor_y,valor_z,simbolo)
     return n_permutaciones
+
 
 def funcion_prueba(n_permutaciones,archivo1):
     archivo = open(archivo1, "r")
@@ -212,33 +301,67 @@ def crear_fi(permutaciones):
     for i in range(0,n):
         fi.append(randfloat(0, 2*pi))
     return fi
+
  
-def funcion_app(archivo1,epsilon1, simbolo, valor_permutaciones,nombre_resultante, nombre_variables,valor_x,valor_y,valor_z):
+def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacionesE1, valor_permutacionesE2, nombre_resultante,nombre_resultante2, nombre_variables,value_x,value_y,value_z,value_x2,value_y2,value_z2):
     if not os.path.exists("process_files"):
             os.makedirs("process_files")
-    permutaciones = numerosiniciales(sqrt(valor_permutaciones),valor_permutaciones, nombre_variables,valor_x,valor_y,valor_z,simbolo)
+    permutaciones = numerosiniciales(sqrt(valor_permutacionesE1),valor_permutacionesE1, nombre_variables,value_x,value_y,value_z,simbolo1)
     funcion_prueba(permutaciones,archivo1)
     fi = crear_fi(permutaciones)
+    permutaciones2 = numerosiniciales(sqrt(valor_permutacionesE2),valor_permutacionesE2, nombre_variables,value_x2,value_y2,value_z2,simbolo2)
+    fi1 = crear_fi(permutaciones2)
     if permutaciones == []:
-        error = "Error in Permutations\nThere is no combination for:\n"+str(valor_permutaciones)+" = x^2 + y^2 + z^2"
+        error = "Error in Permutations\nThere is no combination for:\n"+str(valor_permutacionesE1)+" = x^2 + y^2 + z^2"
+        error = "Error in Permutations\nThere is no combination for:\n"+str(valor_permutacionesE2)+" = x^2 + y^2 + z^2"
+        return ("Permutations",error)
+    elif permutaciones2 == []:
+        error = "Error in Permutations\nThere is no combination for:\n"+str(valor_permutacionesE1)+" = x^2 + y^2 + z^2"
+        error = "Error in Permutations\nThere is no combination for:\n"+str(valor_permutacionesE2)+" = x^2 + y^2 + z^2"
         return ("Permutations",error)
     else:
         try:
-            if simbolo == "<":
+            if simbolo1 == "<" and simbolo2 == "<":
                 try:
+                    print("F1 = < ---- F2 = <")
                     Formula_mayores(permutaciones,archivo1,epsilon1,fi)
-                    print(len(permutaciones))
+                    Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1)
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
                 aleacion("file1.dump",nombre_resultante,nombre_variables)
+                aleacion("file2.dump",nombre_resultante2,nombre_variables)
                 return("Complete","The file has been created successfully.\nResults saved in the 'results' folder.")
-            elif simbolo == ">":
+            elif simbolo1 == ">" and simbolo2 == "<":
                 try:
+                    print("F1 = > ---- F2 = <")
                     Formula_menores(permutaciones,archivo1,epsilon1,fi)
-                    print(len(permutaciones),"permut")
+                    Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1)
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
                 aleacion("file1.dump",nombre_resultante,nombre_variables)
+                aleacion("file2.dump",nombre_resultante2,nombre_variables)
+                return("Complete","The file has been created successfully.\nResults saved in the 'results' folder.")
+            elif simbolo1 == "<" and simbolo2 == ">":
+                try:
+                    print("F1 = < ---- F2 = >")
+                    print(permutaciones,"datosmenores2")
+                    print(permutaciones2,"datos_mayores")
+                    Formula_mayores(permutaciones,archivo1,epsilon1,fi)
+                    Formula_menores2(permutaciones2,archivo1,epsilon2,fi1)
+                except:
+                    return("File 1","Error in File 1\nIncorrect Format")
+                aleacion("file1.dump",nombre_resultante,nombre_variables)
+                aleacion("file2.dump",nombre_resultante2,nombre_variables)
+                return("Complete","The file has been created successfully.\nResults saved in the 'results' folder.")
+            elif simbolo1 == ">" and simbolo2 == ">":
+                try:
+                    print("F1 = > ---- F2 = >")
+                    Formula_menores(permutaciones,archivo1,epsilon1,fi)
+                    Formula_menores2(permutaciones2,archivo1,epsilon2,fi1)
+                except:
+                    return("File 1","Error in File 1\nIncorrect Format")
+                aleacion("file1.dump",nombre_resultante,nombre_variables)
+                aleacion("file2.dump",nombre_resultante2,nombre_variables)
                 return("Complete","The file has been created successfully.\nResults saved in the 'results' folder.")
         except:
             return("Error in the Program")
