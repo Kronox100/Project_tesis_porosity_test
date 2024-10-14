@@ -45,6 +45,7 @@ def Formula_mayores(qi,archivo1,epsilon1,fi):
 
     archivo.close()
     nuevo.close()
+    return nocubico 
 
 def Formula_mayores2(qi,archivo1,epsilon1,fi):
     archivo = open(archivo1, "r")
@@ -84,11 +85,10 @@ def Formula_mayores2(qi,archivo1,epsilon1,fi):
         else:
             nuevo.write(datos[i].rstrip())
             if i != len(datos) - 1:
-                nuevo.write("\n")
-
-
+                nuevo.write("\n")    
     archivo.close()
     nuevo.close()
+    return nocubico 
 
 
 def Formula_menores(qi,archivo1,epsilon1,fi):
@@ -133,6 +133,7 @@ def Formula_menores(qi,archivo1,epsilon1,fi):
 
     archivo.close()
     nuevo.close()
+    return datos 
 
 def Formula_menores2(qi,archivo1,epsilon1,fi):
     archivo = open(archivo1, "r")
@@ -176,6 +177,7 @@ def Formula_menores2(qi,archivo1,epsilon1,fi):
 
     archivo.close()
     nuevo.close()
+    return datos 
 
            
 
@@ -269,24 +271,30 @@ def numerosiniciales(H,H2,nombre_variables,valor_x,valor_y,valor_z,simbolo):
     return n_permutaciones
 
 
-def funcion_prueba(n_permutaciones,archivo1):
+def funcion_prueba(funcion1,funcion2,archivo1):
     archivo = open(archivo1, "r")
     cont_valores=0
     valor_l=[]
     values_maxmin=[]
+    x_value =[]
+    k=0
     for val in archivo:
         cont_valores+= 1
         if cont_valores == 6:
             values_maxmin.append(val.rstrip("\n").split(" "))
-    for i in n_permutaciones:
-        x,y,z = i
-        valor_l.append(x)
 
-    #F = abs((int(x)-float(val_max)/len(valor_l)))
-    print(len(valor_l))
-    print(values_maxmin[0][0])
-    print(values_maxmin[0][1])
-    #print(F)
+    for k in funcion2:
+        x_value.append(k)
+        """         cont_valores+= 1
+        if cont_valores > 9:
+            x_value.append(k) """
+
+    """  for x in x_value:
+        F = abs((-float(values_maxmin[0][1])/len(valor_l))) """
+    #print(len(valor_l))
+    #print(values_maxmin[0][0])
+    #print(values_maxmin[0][1])
+    print("valorx",x_value)
                                                                                                        
 def nocubicos(a,b,c,alpha,beta,gama):
     matriz = []
@@ -303,13 +311,12 @@ def crear_fi(permutaciones):
     return fi
 
  
-def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacionesE1, valor_permutacionesE2, nombre_resultante,nombre_resultante2, nombre_variables,value_x,value_y,value_z,value_x2,value_y2,value_z2):
+def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacionesE1, valor_permutacionesE2, nombre_resultante,nombre_resultante2, nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2):
     if not os.path.exists("process_files"):
             os.makedirs("process_files")
     permutaciones = numerosiniciales(sqrt(valor_permutacionesE1),valor_permutacionesE1, nombre_variables,value_x,value_y,value_z,simbolo1)
-    funcion_prueba(permutaciones,archivo1)
     fi = crear_fi(permutaciones)
-    permutaciones2 = numerosiniciales(sqrt(valor_permutacionesE2),valor_permutacionesE2, nombre_variables,value_x2,value_y2,value_z2,simbolo2)
+    permutaciones2 = numerosiniciales(sqrt(valor_permutacionesE2),valor_permutacionesE2, nombre_variables2,value_x2,value_y2,value_z2,simbolo2)
     fi1 = crear_fi(permutaciones2)
     if permutaciones == []:
         error = "Error in Permutations\nThere is no combination for:\n"+str(valor_permutacionesE1)+" = x^2 + y^2 + z^2"
@@ -324,44 +331,52 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
             if simbolo1 == "<" and simbolo2 == "<":
                 try:
                     print("F1 = < ---- F2 = <")
-                    Formula_mayores(permutaciones,archivo1,epsilon1,fi)
-                    Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1)
+                    print(permutaciones,"datosmenores2")
+                    print(permutaciones2,"datos_mayores")
+                    Funcion1=Formula_mayores(permutaciones,archivo1,epsilon1,fi)
+                    Funcion2=Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1)
+                    funcion_prueba(Funcion1,Funcion2,archivo1)
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
                 aleacion("file1.dump",nombre_resultante,nombre_variables)
-                aleacion("file2.dump",nombre_resultante2,nombre_variables)
+                aleacion("file2.dump",nombre_resultante2,nombre_variables2)
                 return("Complete","The file has been created successfully.\nResults saved in the 'results' folder.")
             elif simbolo1 == ">" and simbolo2 == "<":
                 try:
                     print("F1 = > ---- F2 = <")
-                    Formula_menores(permutaciones,archivo1,epsilon1,fi)
-                    Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1)
+                    print(permutaciones,"datosmenores2")
+                    print(permutaciones2,"datos_mayores")
+                    Funcion1=Formula_menores(permutaciones,archivo1,epsilon1,fi)
+                    Funcion2=Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1)
+
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
                 aleacion("file1.dump",nombre_resultante,nombre_variables)
-                aleacion("file2.dump",nombre_resultante2,nombre_variables)
+                aleacion("file2.dump",nombre_resultante2,nombre_variables2)
                 return("Complete","The file has been created successfully.\nResults saved in the 'results' folder.")
             elif simbolo1 == "<" and simbolo2 == ">":
                 try:
                     print("F1 = < ---- F2 = >")
                     print(permutaciones,"datosmenores2")
                     print(permutaciones2,"datos_mayores")
-                    Formula_mayores(permutaciones,archivo1,epsilon1,fi)
-                    Formula_menores2(permutaciones2,archivo1,epsilon2,fi1)
+                    Funcion1=Formula_mayores(permutaciones,archivo1,epsilon1,fi)
+                    Funcion2=Formula_menores2(permutaciones2,archivo1,epsilon2,fi1)
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
                 aleacion("file1.dump",nombre_resultante,nombre_variables)
-                aleacion("file2.dump",nombre_resultante2,nombre_variables)
+                aleacion("file2.dump",nombre_resultante2,nombre_variables2)
                 return("Complete","The file has been created successfully.\nResults saved in the 'results' folder.")
             elif simbolo1 == ">" and simbolo2 == ">":
                 try:
                     print("F1 = > ---- F2 = >")
-                    Formula_menores(permutaciones,archivo1,epsilon1,fi)
-                    Formula_menores2(permutaciones2,archivo1,epsilon2,fi1)
+                    print(permutaciones,"datosmenores2")
+                    print(permutaciones2,"datos_mayores")
+                    Funcion1=Formula_menores(permutaciones,archivo1,epsilon1,fi)
+                    Funcion2=Formula_menores2(permutaciones2,archivo1,epsilon2,fi1)
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
                 aleacion("file1.dump",nombre_resultante,nombre_variables)
-                aleacion("file2.dump",nombre_resultante2,nombre_variables)
+                aleacion("file2.dump",nombre_resultante2,nombre_variables2)
                 return("Complete","The file has been created successfully.\nResults saved in the 'results' folder.")
         except:
             return("Error in the Program")

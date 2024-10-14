@@ -10,7 +10,7 @@ import Soyarslan_no_cubico as Soyarslan_no_cubico
 class MyThread(QThread):
     resultado_signal = pyqtSignal(tuple)
 
-    def __init__(self, archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2, nombre_resultante,nombre_resultante2,nombre_variables,value_x,value_y,value_z,value_x2,value_y2,value_z2):
+    def __init__(self, archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2, nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2):
         super().__init__()
         self.archivo1 = archivo1
         self.epsilon1 = epsilon1
@@ -28,9 +28,10 @@ class MyThread(QThread):
         self.nombre_resultante = nombre_resultante
         self.nombre_resultante2 = nombre_resultante2
         self.nombre_variables = nombre_variables
+        self.nombre_variables2 = nombre_variables2
 
     def run(self):
-        resultado = Soyarslan_no_cubico.funcion_app(self.archivo1, self.epsilon1,self.epsilon2, self.simbolo1,self.simbolo2 , self.valor_permutacionesE1,self.valor_permutacionesE2, self.nombre_resultante,self.nombre_resultante2,self.nombre_variables,self.valor_x,self.valor_y,self.valor_z,self.valor_x2,self.valor_y2,self.valor_z2)
+        resultado = Soyarslan_no_cubico.funcion_app(self.archivo1, self.epsilon1,self.epsilon2, self.simbolo1,self.simbolo2 , self.valor_permutacionesE1,self.valor_permutacionesE2, self.nombre_resultante,self.nombre_resultante2,self.nombre_variables,self.nombre_variables2,self.valor_x,self.valor_y,self.valor_z,self.valor_x2,self.valor_y2,self.valor_z2)
         self.resultado_signal.emit(resultado)
 
 class MainWindow(QWidget):
@@ -387,12 +388,14 @@ class MainWindow(QWidget):
         simbolo1 = str(boton_simbolo_var.text())
         simbolo2 = str(btn_Simbolo2_var.text())
         nombre_variables = str(nombre_archivo_entry.text())
+        nombre_variables2 = str(nombre_archivo_entry.text())
         nombre_resultante = str(nombre_archivo_entry.text() + "_1.dump")
         nombre_resultante2 = str(nombre_archivo_entry.text() + "_2.dump")
 
         if simbolo1 == ">" and simbolo2 == ">":
             if epsilon1 != "" and epsilon2 != "" and value_x !="" and value_y != "" and value_z != "" and value_z2 != "" and value_y2 != "" and value_x2 != "":
-                variables = open("results/"+nombre_variables+".log", "w")
+                variables = open("results/"+nombre_variables+"1.log", "w")
+                variables = open("results/"+nombre_variables2+"2.log", "w")
                 variables.write(("Epsilon 1: " + str(epsilon1)) + "\n")
                 variables.write(("Epsilon 2: " + str(epsilon2)) + "\n")
                 variables.write(("Permutations 1: " + str(valor_permutacionesE1)) + "\n")
@@ -410,14 +413,15 @@ class MainWindow(QWidget):
 
                 # Proceso en otro hilo
                 self.thread = MyThread(archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2, 
-                                        nombre_resultante,nombre_resultante2,nombre_variables,value_x,value_y,value_z,value_x2,value_y2,value_z2)
+                                        nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2)
                 self.thread.resultado_signal.connect(self.show_result)
                 self.thread.start()
             else:
                 QMessageBox.information(None, "", "Epsilon 1, X, Y and Z must have data")
         elif simbolo1 == ">" and simbolo2 == "<":
             if epsilon1 != "" and epsilon2 != "" and value_x !="" and value_y != "" and value_z != "" and value_z2 != "" and value_y2 != "" and value_x2 != "":
-                variables = open("results/"+nombre_variables+".log", "w")
+                variables = open("results/"+nombre_variables+"1.log", "w")
+                variables = open("results/"+nombre_variables2+"2.log", "w")
                 variables.write(("Epsilon 1: " + str(epsilon1)) + "\n")
                 variables.write(("Epsilon 2: " + str(epsilon2)) + "\n")
                 variables.write(("Permutations 1: " + str(valor_permutacionesE1)) + "\n")
@@ -435,7 +439,7 @@ class MainWindow(QWidget):
 
                 # Proceso en otro hilo
                 self.thread = MyThread(archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2, 
-                                        nombre_resultante,nombre_resultante2,nombre_variables,value_x,value_y,value_z,value_x2,value_y2,value_z2)
+                                        nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2)
                 self.thread.resultado_signal.connect(self.show_result)
                 self.thread.start()
             else:
@@ -443,6 +447,7 @@ class MainWindow(QWidget):
         elif simbolo1 == "<" and simbolo2 == ">":
             if epsilon1 != "" and epsilon2 != "" and value_x !="" and value_y != "" and value_z != "" and value_z2 != "" and value_y2 != "" and value_x2 != "":
                 variables = open("results/"+nombre_variables+".log", "w")
+                variables = open("results/"+nombre_variables2+"2.log", "w")
                 variables.write(("Epsilon 1: " + str(epsilon1)) + "\n")
                 variables.write(("Epsilon 2: " + str(epsilon2)) + "\n")
                 variables.write(("Permutations 1: " + str(valor_permutacionesE1)) + "\n")
@@ -460,7 +465,7 @@ class MainWindow(QWidget):
 
                 # Proceso en otro hilo
                 self.thread = MyThread(archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2, 
-                                        nombre_resultante,nombre_resultante2,nombre_variables,value_x,value_y,value_z,value_x2,value_y2,value_z2)
+                                        nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2)
                 self.thread.resultado_signal.connect(self.show_result)
                 self.thread.start()
             else:
@@ -468,6 +473,7 @@ class MainWindow(QWidget):
         elif simbolo1 == "<" and simbolo2 == "<":
             if epsilon1 != "" and epsilon2 != "" and value_x !="" and value_y != "" and value_z != "" and value_z2 != "" and value_y2 != "" and value_x2 != "":
                 variables = open("results/"+nombre_variables+".log", "w")
+                variables = open("results/"+nombre_variables2+"2.log", "w")
                 variables.write(("Epsilon 1: " + str(epsilon1)) + "\n")
                 variables.write(("Epsilon 2: " + str(epsilon2)) + "\n")
                 variables.write(("Permutations 1: " + str(valor_permutacionesE1)) + "\n")
@@ -485,7 +491,7 @@ class MainWindow(QWidget):
 
                 # Proceso en otro hilo
                 self.thread = MyThread(archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2, 
-                                        nombre_resultante,nombre_resultante2,nombre_variables,value_x,value_y,value_z,value_x2,value_y2,value_z2)
+                                        nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2)
                 self.thread.resultado_signal.connect(self.show_result)
                 self.thread.start()
             else:

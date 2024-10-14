@@ -1,3 +1,0 @@
-Epsilon 1: 0.0
-Permutations: 11
-File 1: E1 < Values 
