@@ -328,15 +328,14 @@ def F_prime(x, Xmin, Xmax, l):
         normalized_item = [
             item[0],  # ID (sin normalización)
             item[1],  # Type (sin normalización)
-            normalized_value  # Valor normalizado (0 o 1)
         ]
         
-        # Calcular s_x o f_x según el valor de normalized_item[2]
-        if normalized_item[2] == 0:
+        # Calcular s_x o f_x según el valor de normalized_value
+        if normalized_value == 0:
             # Aplicar la fórmula cuando F(x) = 0
             s_x = abs(Xmax - float(item[2])) / l if l != 0 else 0
             normalized_item.append(s_x)  # Dividir por l
-        elif normalized_item[2] == 1:
+        elif normalized_value == 1:
             # Aplicar la fórmula cuando F(x) = 1
             f_x = abs(float(item[2]) - Xmin) / l if l != 0 else 0
             normalized_item.append(f_x)
