@@ -286,7 +286,7 @@ def numerosiniciales(H,H2,nombre_variables,valor_x,valor_y,valor_z,simbolo):
     return n_permutaciones
 
 
-def funcion_prueba(archivo1):             
+def funcion_prueba(archivo1,permutaciones,permutaciones2,epsilon1,epsilon2,fi,fi1):             
     archivo = open(archivo1, "r")
     cont_valores=0
     values_maxmin=[]
@@ -299,40 +299,47 @@ def funcion_prueba(archivo1):
             valor_x1.append((val.rstrip("\n").split(" ")))
     valor_l = float(values_maxmin[0][1]) -  float(values_maxmin[0][0])
 
-    print(valor_l)
     Xmin = float(values_maxmin[0][0])
     Xmax = float(values_maxmin[0][1])
-    normalized_list = F_prime(valor_x1,Xmin,Xmax,valor_l,)
-    print(len(normalized_list))
-    
+
+    valor_Lambda = F_prime(valor_x1,Xmin,Xmax,valor_l)
+    mayor1=Formula_mayores(permutaciones,archivo1,epsilon1,fi)
+    mayor2=Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1)
+    # Inicializar F_prima acumulado
+    F_prima_total = 0
+
+    print(valor_Lambda)
+    # Recorrer los valores de lambda
+    #for F in valor_Lambda[]:
+    #    F_prima = F * mayor1 + (1 - F) * mayor2
+    #    F_prima_total += F_prima  # Acumular el resultado
+
+    return F_prima_total
+
 
 def F_prime(x, Xmin, Xmax, l):
     normalized_list = []
-    
-    # Iterar sobre cada sublista de 'x'
+
     for item in x:
-        # Normalizar los valores de las coordenadas (columnas 2, 3 y 4)
+        normalized_value = 0 if float(item[2]) <= Xmin else (
+            1 if float(item[2]) >= Xmax else 0  
+        )
+
         normalized_item = [
             item[0],  # ID (sin normalización)
             item[1],  # Type (sin normalización)
-            # Normalizar X
-            0 if float(item[2]) <= Xmin else (
-                1 if float(item[2]) >= Xmax else (float(item[2]) - Xmin) / (Xmax - Xmin)
-            )
+            normalized_value  # Valor normalizado (0 o 1)
         ]
         
-        # Calcular lambda
-        lambda_value = abs(float(item[2]) - Xmax) if normalized_item[2] == 0 else abs(float(item[2]) - Xmin)
-        
-        # Aplicar la fórmula correspondiente según el valor de la normalización
+        # Calcular s_x o f_x según el valor de normalized_item[2]
         if normalized_item[2] == 0:
             # Aplicar la fórmula cuando F(x) = 0
-            s_x = abs(Xmax - float(item[2])) / lambda_value if lambda_value != 0 else 0
-            normalized_item.append(s_x / l)  # Dividir por l
+            s_x = abs(Xmax - float(item[2])) / l if l != 0 else 0
+            normalized_item.append(s_x)  # Dividir por l
         elif normalized_item[2] == 1:
             # Aplicar la fórmula cuando F(x) = 1
-            f_x = abs(float(item[2]) - Xmin) / lambda_value if lambda_value != 0 else 0
-            normalized_item.append(f_x / l)  # Dividir por l
+            f_x = abs(float(item[2]) - Xmin) / l if l != 0 else 0
+            normalized_item.append(f_x)
 
         # Agregar el ítem normalizado a la nueva lista
         normalized_list.append(normalized_item)
@@ -375,10 +382,12 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
             if simbolo1 == "<" and simbolo2 == "<":
                 try:
                     print("F1 = < ---- F2 = <")
-                    mayor1=Formula_mayores(permutaciones,archivo1,epsilon1,fi)
-                    mayor2=Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1)
-                    funcion_prueba(archivo1)
-                    #print("mayores1: ",mayor1,"mayor2: ",mayor2)
+                    #mayor1=Formula_mayores(permutaciones,archivo1,epsilon1,fi)
+                    #mayor2=Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1)
+                    lambda_ = funcion_prueba(archivo1,permutaciones,permutaciones2,epsilon1,epsilon2,fi,fi1)
+                    print(lambda_)
+                    #F_prima = lambda_ * mayor1 + (1 - lambda_) * mayor2
+
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
                 aleacion("file1.dump",nombre_resultante,nombre_variables)
