@@ -307,7 +307,6 @@ def funcion_prueba(archivo1,permutaciones,permutaciones2,epsilon1,epsilon2,fi,fi
     mayor2=Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1)
     # Inicializar F_prima acumulado
     F_prima_total = 0
-    print(mayor1)
     #print(valor_Lambda)
     # Recorrer los valores de lambda
     min_length = min(len(valor_Lambda), len(mayor1), len(mayor2))
@@ -318,6 +317,7 @@ def funcion_prueba(archivo1,permutaciones,permutaciones2,epsilon1,epsilon2,fi,fi
         F_prima = valor * mayor1[i] + (1 - valor) * mayor2[i]  # Calcular F_prima
         F_prima_total += F_prima  # Acumular el resultado
 
+    return F_prima_total
 
 def F_prime(x, Xmin, Xmax, l):
     normalized_list = []
