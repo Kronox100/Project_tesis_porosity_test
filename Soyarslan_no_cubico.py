@@ -9,6 +9,7 @@ def Formula_mayores(qi,archivo1,epsilon1,fi):
     x =y=z = 0
     lineac = 0
     datos =[]
+    valor_mayores1=[]
     nocubico = []
     ID = 0
     n = len(qi)
@@ -29,11 +30,13 @@ def Formula_mayores(qi,archivo1,epsilon1,fi):
             for j in range(n):
                 valor += cos((qi[j][0]*((2*pi)/nocubico[0])*float(r[2]) + (qi[j][1]*((2*pi)/nocubico[1])*float(r[3]) + (qi[j][2]*((2*pi)/nocubico[2])*float(r[4]) + fi[j]))))#fi
             norm = sqrt(2/n)
-            valor = valor * norm   
+            valor = valor * norm
             if epsilon1 < valor:
                 ID += 1
                 texto = f"{ID} {r[1]} {r[2]} {r[3]} {r[4]}"
                 datos.append(texto)
+            elif valor < epsilon1:
+                valor_mayores1.append(valor)
     datos[3] = str(ID) + "\n"
     for i in range(0, len(datos)):
         if i<9:
@@ -45,13 +48,15 @@ def Formula_mayores(qi,archivo1,epsilon1,fi):
 
     archivo.close()
     nuevo.close()
-    return nocubico 
+    #print(len(valor2),'valor2')
+    return valor_mayores1
 
 def Formula_mayores2(qi,archivo1,epsilon1,fi):
     archivo = open(archivo1, "r")
     nuevo = open("process_files/file2.dump", "w")
     x =y=z = 0
     lineac = 0
+    valor_mayores2 =[]
     datos =[]
     nocubico = []
     ID = 0
@@ -73,11 +78,13 @@ def Formula_mayores2(qi,archivo1,epsilon1,fi):
             for j in range(n):
                 valor += cos((qi[j][0]*((2*pi)/nocubico[0])*float(r[2]) + (qi[j][1]*((2*pi)/nocubico[1])*float(r[3]) + (qi[j][2]*((2*pi)/nocubico[2])*float(r[4]) + fi[j]))))#fi
             norm = sqrt(2/n)
-            valor = valor * norm   
+            valor = valor * norm
             if epsilon1 < valor:
                 ID += 1
                 texto = f"{ID} {r[1]} {r[2]} {r[3]} {r[4]}"
                 datos.append(texto)
+            elif valor < epsilon1:
+                valor_mayores2.append(valor)
     datos[3] = str(ID) + "\n"
     for i in range(0, len(datos)):
         if i<9:
@@ -88,7 +95,8 @@ def Formula_mayores2(qi,archivo1,epsilon1,fi):
                 nuevo.write("\n")    
     archivo.close()
     nuevo.close()
-    return nocubico 
+    return valor_mayores2
+
 
 
 def Formula_menores(qi,archivo1,epsilon1,fi):
@@ -97,6 +105,7 @@ def Formula_menores(qi,archivo1,epsilon1,fi):
     x =y=z = 0
     lineac = 0
     datos =[]
+    valor_menores1 = []
     nocubico = []
     ID = 0
     n = len(qi)
@@ -122,6 +131,8 @@ def Formula_menores(qi,archivo1,epsilon1,fi):
                 ID += 1
                 texto = f"{ID} {r[1]} {r[2]} {r[3]} {r[4]}"
                 datos.append(texto)
+            elif  valor < epsilon1:
+                valor_menores1.append(valor)
     datos[3] = str(ID) + "\n"
     for i in range(0, len(datos)):
         if i<9:
@@ -133,7 +144,7 @@ def Formula_menores(qi,archivo1,epsilon1,fi):
 
     archivo.close()
     nuevo.close()
-    return datos 
+    return valor_menores1
 
 def Formula_menores2(qi,archivo1,epsilon1,fi):
     archivo = open(archivo1, "r")
@@ -141,6 +152,7 @@ def Formula_menores2(qi,archivo1,epsilon1,fi):
     x =y=z = 0
     lineac = 0
     datos =[]
+    valor_menores2=[]
     nocubico = []
     ID = 0
     n = len(qi)
@@ -166,6 +178,8 @@ def Formula_menores2(qi,archivo1,epsilon1,fi):
                 ID += 1
                 texto = f"{ID} {r[1]} {r[2]} {r[3]} {r[4]}"
                 datos.append(texto)
+            elif valor < epsilon1:
+                valor_menores2.append(valor)
     datos[3] = str(ID) + "\n"
     for i in range(0, len(datos)):
         if i<9:
@@ -177,7 +191,8 @@ def Formula_menores2(qi,archivo1,epsilon1,fi):
 
     archivo.close()
     nuevo.close()
-    return datos 
+    return valor_menores2
+
 
            
 
@@ -271,31 +286,60 @@ def numerosiniciales(H,H2,nombre_variables,valor_x,valor_y,valor_z,simbolo):
     return n_permutaciones
 
 
-def funcion_prueba(funcion1,funcion2,archivo1):
+def funcion_prueba(archivo1):             
     archivo = open(archivo1, "r")
     cont_valores=0
-    valor_l=[]
     values_maxmin=[]
-    x_value =[]
-    k=0
+    valor_x1 = []
     for val in archivo:
         cont_valores+= 1
         if cont_valores == 6:
             values_maxmin.append(val.rstrip("\n").split(" "))
-
-    for k in funcion2:
-        x_value.append(k)
-        """         cont_valores+= 1
         if cont_valores > 9:
-            x_value.append(k) """
+            valor_x1.append((val.rstrip("\n").split(" ")))
+    valor_l = float(values_maxmin[0][1]) -  float(values_maxmin[0][0])
 
-    """  for x in x_value:
-        F = abs((-float(values_maxmin[0][1])/len(valor_l))) """
-    #print(len(valor_l))
-    #print(values_maxmin[0][0])
-    #print(values_maxmin[0][1])
-    print("valorx",x_value)
-                                                                                                       
+    print(valor_l)
+    Xmin = float(values_maxmin[0][0])
+    Xmax = float(values_maxmin[0][1])
+    normalized_list = F_prime(valor_x1,Xmin,Xmax,valor_l,)
+    print(len(normalized_list))
+    
+
+def F_prime(x, Xmin, Xmax, l):
+    normalized_list = []
+    
+    # Iterar sobre cada sublista de 'x'
+    for item in x:
+        # Normalizar los valores de las coordenadas (columnas 2, 3 y 4)
+        normalized_item = [
+            item[0],  # ID (sin normalización)
+            item[1],  # Type (sin normalización)
+            # Normalizar X
+            0 if float(item[2]) <= Xmin else (
+                1 if float(item[2]) >= Xmax else (float(item[2]) - Xmin) / (Xmax - Xmin)
+            )
+        ]
+        
+        # Calcular lambda
+        lambda_value = abs(float(item[2]) - Xmax) if normalized_item[2] == 0 else abs(float(item[2]) - Xmin)
+        
+        # Aplicar la fórmula correspondiente según el valor de la normalización
+        if normalized_item[2] == 0:
+            # Aplicar la fórmula cuando F(x) = 0
+            s_x = abs(Xmax - float(item[2])) / lambda_value if lambda_value != 0 else 0
+            normalized_item.append(s_x / l)  # Dividir por l
+        elif normalized_item[2] == 1:
+            # Aplicar la fórmula cuando F(x) = 1
+            f_x = abs(float(item[2]) - Xmin) / lambda_value if lambda_value != 0 else 0
+            normalized_item.append(f_x / l)  # Dividir por l
+
+        # Agregar el ítem normalizado a la nueva lista
+        normalized_list.append(normalized_item)
+    
+    return normalized_list
+
+
 def nocubicos(a,b,c,alpha,beta,gama):
     matriz = []
     matriz.append(a)
@@ -331,11 +375,10 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
             if simbolo1 == "<" and simbolo2 == "<":
                 try:
                     print("F1 = < ---- F2 = <")
-                    print(permutaciones,"datosmenores2")
-                    print(permutaciones2,"datos_mayores")
-                    Funcion1=Formula_mayores(permutaciones,archivo1,epsilon1,fi)
-                    Funcion2=Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1)
-                    funcion_prueba(Funcion1,Funcion2,archivo1)
+                    mayor1=Formula_mayores(permutaciones,archivo1,epsilon1,fi)
+                    mayor2=Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1)
+                    funcion_prueba(archivo1)
+                    #print("mayores1: ",mayor1,"mayor2: ",mayor2)
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
                 aleacion("file1.dump",nombre_resultante,nombre_variables)
@@ -346,8 +389,8 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
                     print("F1 = > ---- F2 = <")
                     print(permutaciones,"datosmenores2")
                     print(permutaciones2,"datos_mayores")
-                    Funcion1=Formula_menores(permutaciones,archivo1,epsilon1,fi)
-                    Funcion2=Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1)
+                    Formula_menores(permutaciones,archivo1,epsilon1,fi)
+                    Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1)
 
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
@@ -359,8 +402,8 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
                     print("F1 = < ---- F2 = >")
                     print(permutaciones,"datosmenores2")
                     print(permutaciones2,"datos_mayores")
-                    Funcion1=Formula_mayores(permutaciones,archivo1,epsilon1,fi)
-                    Funcion2=Formula_menores2(permutaciones2,archivo1,epsilon2,fi1)
+                    Formula_mayores(permutaciones,archivo1,epsilon1,fi)
+                    Formula_menores2(permutaciones2,archivo1,epsilon2,fi1)
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
                 aleacion("file1.dump",nombre_resultante,nombre_variables)
@@ -371,8 +414,8 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
                     print("F1 = > ---- F2 = >")
                     print(permutaciones,"datosmenores2")
                     print(permutaciones2,"datos_mayores")
-                    Funcion1=Formula_menores(permutaciones,archivo1,epsilon1,fi)
-                    Funcion2=Formula_menores2(permutaciones2,archivo1,epsilon2,fi1)
+                    Formula_menores(permutaciones,archivo1,epsilon1,fi)
+                    Formula_menores2(permutaciones2,archivo1,epsilon2,fi1)
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
                 aleacion("file1.dump",nombre_resultante,nombre_variables)
