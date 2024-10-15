@@ -339,7 +339,6 @@ def F_prime(x, Xmin, Xmax, l):
             # Aplicar la fórmula cuando F(x) = 1
             f_x = abs(float(item[2]) - Xmin) / l if l != 0 else 0
             normalized_item.append(f_x)
-
         # Agregar el ítem normalizado a la nueva lista
         normalized_list.append(normalized_item)
     
