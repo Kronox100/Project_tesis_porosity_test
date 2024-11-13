@@ -1,41 +1,67 @@
-def funcion_prueba(archivo1, mayor1, mayor2, epsilon1, epsilon2):
-    with open(archivo1, "r") as archivo:
-        cont_valores = 0
-        valor_x1 = []
-        f_prima_values = []
-        incremental = 1
-        
-        # Leer el archivo y extraer los valores de X
-        for val in archivo:
-            cont_valores += 1
-            # Almacenar los valores de X a partir de la línea 10
-            if cont_valores > 9:
-                valores = val.rstrip("\n").split(" ")
-                if len(valores) >= 3:  # Asegurarse de que haya al menos 3 columnas (id, type, x, y, z)
-                    x_val = float(valores[2])  # Obtener el valor de X
-                    valor_x1.append(x_val)
-        
-        # Definir la función lambda para calcular el valor
-        valor = lambda x: (x / 310.00) + 1/2
-        
-        # Aplicar la función F_prima solo a los valores de X en mayor1 y mayor2
-        for i in range(len(mayor1)):
-            x_mayor1 = mayor1[i][0]  # Obtener solo la coordenada X de mayor1
-            x_mayor2 = mayor2[i][0]  # Obtener solo la coordenada X de mayor2
-            
-            # Calcular F_prima usando los valores de X de mayor1 y mayor2
-            F_prima = valor(x_mayor1) * x_mayor1 + (1 - valor(x_mayor1)) * x_mayor2
-            
-            # Filtrar y escribir en el archivo de salida si cumple la condición
-            if F_prima > epsilon1 and F_prima > epsilon2:
-                with open("process_files/F_prime_result.dump", "a") as archivo_salida:
-                    archivo_salida.write(f"{incremental} 1 {mayor1[i][0]:.3f} {mayor1[i][1]:.3f} {mayor1[i][2]:.3f}\n")
-                incremental += 1
-            else:
-                # Escribir los otros átomos aunque no cumplan la condición
-                with open("process_files/F_prime_result.dump", "a") as archivo_salida:
-                    archivo_salida.write(f"{incremental} 1 {mayor2[i][0]:.3f} {mayor2[i][1]:.3f} {mayor2[i][2]:.3f}\n")
-                incremental += 1
-    
-    print("Incremental final:", incremental)
-    return f_prima_values
+        with open("process_files/F_prime_result.dump", "w") as archivo_salida:
+            # Escribir los datos iniciales al archivo de salida
+            for dato in datos:
+                archivo_salida.write(dato)
+
+            # Iterar sobre cada átomo
+            for i in range(val_atom):
+                coordenadas = valor_x1[i]  # Extraer las coordenadas como lista de floats
+                # Calcular F_prima usando una lambda
+                valor = lambda x: (x / valor_xminmax) + 1 / 2
+                F_prima = valor(coordenadas[0]) * value1[i] + (1 - valor(coordenadas[0])) * value2[i]
+
+                # Evaluar si F_prima cumple la condición para incrementar según el tipo
+                if tipo == 1:  # F1 = < y F2 = <
+                    if F_prima > epsilon1 and F_prima > epsilon2:
+                        archivo_salida.write(f"{incremental} 1 {coordenadas[2]:.3f} {coordenadas[1]:.3f} {coordenadas[0]:.3f}\n")
+                        incremental += 1
+                elif tipo == 2:  # F1 = > y F2 = <
+                    if F_prima < epsilon1 and F_prima > epsilon2:
+                        archivo_salida.write(f"{incremental} 1 {coordenadas[2]:.3f} {coordenadas[1]:.3f} {coordenadas[0]:.3f}\n")
+                        incremental += 1
+                elif tipo == 3:  # F1 = < y F2 = >
+                    if F_prima > epsilon1 and F_prima < epsilon2:
+                        archivo_salida.write(f"{incremental} 1 {coordenadas[2]:.3f} {coordenadas[1]:.3f} {coordenadas[0]:.3f}\n")
+                        incremental += 1
+                elif tipo == 4:  # F1 = > y F2 = >
+                    if F_prima < epsilon1 and F_prima < epsilon2:
+                        archivo_salida.write(f"{incremental} 1 {coordenadas[2]:.3f} {coordenadas[1]:.3f} {coordenadas[0]:.3f}\n")
+                        incremental += 1
+
+        # Actualizar el número total de átomos en la línea correspondiente
+        with open("process_files/F_prime_result.dump", "r+") as archivo_salida:
+            archivo_salida_lines = archivo_salida.readlines()
+            archivo_salida_lines[3] = f"{incremental - 1}\n"
+            archivo_salida.seek(0)
+            archivo_salida.writelines(archivo_salida_lines)
+
+    print("Incremental final:", incremental - 1)
+    # Generar archivo GCODE
+    with open("results/F_prime_result.gcode", "w") as gcode_salida:
+        gcode_salida.write("; GCODE generado a partir de F_prime_result.dump\n")
+        gcode_salida.write("G28 ; Home all axes\n")  # Llevar todos los ejes a origen
+        gcode_salida.write("G1 Z0.3 F7200 ; Levantar boquilla a 0.3mm\n")
+
+        for i in range(val_atom):
+            coordenada_x = valor_x1[i]
+
+            # Calcular F_prima usando la misma lógica
+            valor = lambda x: (x / valor_xminmax) + 1 / 2
+            F_prima = valor(coordenada_x[0]) * value1[i] + (1 - valor(coordenada_x[0])) * value2[i]
+
+            # Generar movimiento GCODE basado en la condición del tipo
+            if tipo == 1 and F_prima > epsilon1 and F_prima > epsilon2:
+                gcode_salida.write(f"G1 X{coordenada_x[2]:.3f} Y0.000 Z0.300 F1500 ; Mover a X{coordenada_x[2]:.3f}\n")
+            elif tipo == 2 and F_prima < epsilon1 and F_prima > epsilon2:
+                gcode_salida.write(f"G1 X{coordenada_x[2]:.3f} Y0.000 Z0.300 F1500 ; Mover a X{coordenada_x[2]:.3f}\n")
+            elif tipo == 3 and F_prima > epsilon1 and F_prima < epsilon2:
+                gcode_salida.write(f"G1 X{coordenada_x[2]:.3f} Y0.000 Z0.300 F1500 ; Mover a X{coordenada_x[2]:.3f}\n")
+            elif tipo == 4 and F_prima < epsilon1 and F_prima < epsilon2:
+                gcode_salida.write(f"G1 X{coordenada_x[2]:.3f} Y0.000 Z0.300 F1500 ; Mover a X{coordenada_x[2]:.3f}\n")
+
+        gcode_salida.write("M104 S0 ; Apagar extrusor\n")
+        gcode_salida.write("M140 S0 ; Apagar cama caliente\n")
+        gcode_salida.write("G28 X0 Y0 ; Home X Y\n")
+        gcode_salida.write("M84 ; Desactivar motores\n")
+
+        print(".Gcode Ok!")
