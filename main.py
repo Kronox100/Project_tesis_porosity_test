@@ -4,9 +4,6 @@ from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButto
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 import Soyarslan_no_cubico as Soyarslan_no_cubico
 
-from PyQt6.QtCore import QThread, pyqtSignal
-import Soyarslan_no_cubico as Soyarslan_no_cubico
-
 class MyThread(QThread):
     resultado_signal = pyqtSignal(tuple)
 
@@ -39,7 +36,7 @@ class MainWindow(QWidget):
         super().__init__()
         self.setWindowTitle('Nanopore Structure')
         self.layout = QVBoxLayout()
-        self.setStyleSheet("background-color: #D8E4FD;")
+        self.setStyleSheet("background-color: #b1bbd7;")
 
         # Fuentes de la letra
         titulo = "font-family: Arial; font-size: 24pt; font-weight: bold;color: black;"
@@ -58,7 +55,7 @@ class MainWindow(QWidget):
         # Frames
         def crear_frame_contenido(layout):
             frame = QFrame()
-            frame.setStyleSheet("background-color: white; padding: 10px; border-radius: 10px;")
+            frame.setStyleSheet("background-color: #f1f3f9 ; padding: 10px; border-radius: 10px;")
             layout_frame = QVBoxLayout(frame)
             layout_frame.addLayout(layout)
             return frame
@@ -78,7 +75,7 @@ class MainWindow(QWidget):
 
         # Layout sub_titulo
         layout_sub_titulo = QHBoxLayout()
-        label_sub_titulo = QLabel("Core-Shell Type")
+        label_sub_titulo = QLabel("Hybrid Material Type")
         label_sub_titulo.setStyleSheet(sub_titulo)
         label_sub_titulo.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout_sub_titulo.addWidget(label_sub_titulo)
