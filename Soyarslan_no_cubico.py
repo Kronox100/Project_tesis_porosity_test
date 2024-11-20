@@ -282,13 +282,13 @@ def numerosiniciales(H,H2,nombre_variables,valor_x,valor_y,valor_z,simbolo): ##I
     n_permutaciones = calcular_con_operadores(permutaciones,valor_x,valor_y,valor_z,simbolo)
     return n_permutaciones
 
-def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2,tipo):
+def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo):
     with open(archivo1, "r") as archivo:
         cont_valores = 0
         values_maxmin = []
         valor_x1 = []
         datos = []
-        incremental = 1
+        incremental = 0
         largo_x = 0
 
         # Leer el archivo y extraer los valores
@@ -316,28 +316,10 @@ def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2,tipo):
             # Iterar sobre cada átomo
             for i in range(val_atom):
                 coordenadas = valor_x1[i]  # Extraer las coordenadas como lista de floats
-                # Calcular F_prima usando una lambda
-                #valor = lambda x: (x / valor_xminmax) + 1 / 2
-                valor = lambda x: (x / valor_xminmax) + 1/2
-                F_prima = valor(coordenadas[0]) * value1[i] + (1 - valor(coordenadas[0])) * value2[i]
-
-                # Evaluar si F_prima cumple la condición para incrementar
-                if F_prima > epsilon1 and F_prima > epsilon2:
-                    archivo_salida.write(f"{incremental} 1 {coordenadas[2]:.3f} {coordenadas[1]:.3f} {coordenadas[0]:.3f}\n")
-                    incremental += 1
-
-        # Actualizar el número total de átomos en la línea correspondiente
-        with open("process_files/F_prime_result.dump", "w") as archivo_salida:
-            # Escribir los datos iniciales al archivo de salida
-            for dato in datos:
-                archivo_salida.write(dato)
-
-            # Iterar sobre cada átomo
-            for i in range(val_atom):
-                coordenadas = valor_x1[i]  # Extraer las coordenadas como lista de floats
-                # Calcular F_prima usando una lambda
-                valor = lambda x: (x / valor_xminmax) + 1 / 2
-                F_prima = valor(coordenadas[0]) * value1[i] + (1 - valor(coordenadas[0])) * value2[i]
+                # Calcular F_prima usando value1 y value2
+                valor = lambda x: (x / valor_xminmax) if valor_xminmax != 0 else 0.5
+                ponderacion = valor(coordenadas[0])
+                F_prima = ponderacion * value1[i] + (1 - ponderacion) * value2[i]
 
                 # Evaluar si F_prima cumple la condición para incrementar según el tipo
                 if tipo == 1:  # F1 = < y F2 = <
@@ -360,11 +342,11 @@ def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2,tipo):
         # Actualizar el número total de átomos en la línea correspondiente
         with open("process_files/F_prime_result.dump", "r+") as archivo_salida:
             archivo_salida_lines = archivo_salida.readlines()
-            archivo_salida_lines[3] = f"{incremental - 1}\n"
+            archivo_salida_lines[3] = f"{incremental}\n"
             archivo_salida.seek(0)
             archivo_salida.writelines(archivo_salida_lines)
 
-    print("Incremental final:", incremental - 1)
+    print("Incremental final:", incremental)
     # Generar archivo GCODE
     with open("results/F_prime_result.gcode", "w") as gcode_salida:
         gcode_salida.write("; GCODE generado a partir de F_prime_result.dump\n")
@@ -375,8 +357,8 @@ def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2,tipo):
             coordenada_x = valor_x1[i]
 
             # Calcular F_prima usando la misma lógica
-            valor = lambda x: (x / valor_xminmax) + 1 / 2
-            F_prima = valor(coordenada_x[0]) * value1[i] + (1 - valor(coordenada_x[0])) * value2[i]
+            ponderacion = valor(coordenada_x[0])
+            F_prima = ponderacion * value1[i] + (1 - ponderacion) * value2[i]
 
             # Generar movimiento GCODE basado en la condición del tipo
             if tipo == 1 and F_prima > epsilon1 and F_prima > epsilon2:
@@ -393,7 +375,7 @@ def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2,tipo):
         gcode_salida.write("G28 X0 Y0 ; Home X Y\n")
         gcode_salida.write("M84 ; Desactivar motores\n")
 
-        print(".Gcode Ok!")
+    print(".Gcode Ok!")
 
 
 def nocubicos(a,b,c,alpha,beta,gama):
