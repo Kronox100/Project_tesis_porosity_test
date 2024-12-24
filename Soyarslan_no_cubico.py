@@ -2,6 +2,12 @@ from math import sqrt, cos, pi, sin, radians
 from random import uniform as randfloat
 from random import seed as semilla
 import os
+import numpy as np
+from scipy.ndimage import gaussian_filter, binary_dilation
+from stl import mesh
+from skimage import measure
+    
+    
     
 def Formula_mayores(qi,archivo1,epsilon1,fi):
     archivo = open(archivo1, "r")
@@ -245,9 +251,9 @@ def aleacion(archivo1, nombre_resultante, nombre_variables):
 def calcular_con_operadores(permutaciones2, valor_x2, valor_y2, valor_z2, operador_menor):
     # Filtra las tuplas según el operador menor
     if operador_menor == "<":
-        resultado = [p for p in permutaciones2 if p[0] <= valor_x2 and p[1] <= valor_y2 and p[2] <= valor_z2]
+        resultado = [p for p in permutaciones2 if p[0] <= valor_x2 and abs(p[1]) <= valor_y2 and p[2] <= valor_z2]
     elif operador_menor == ">":
-        resultado = [p for p in permutaciones2 if p[0] >= valor_x2 and p[1] >= valor_y2 and p[2] >= valor_z2]
+        resultado = [p for p in permutaciones2 if p[0] >= valor_x2 and abs(p[1]) >= valor_y2 and p[2] >= valor_z2]
     else:
         raise ValueError("Operador mayor no válido. Use '<','>'")
 
@@ -289,25 +295,25 @@ def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo):
         valor_x1 = []
         datos = []
         incremental = 0
-        largo_x = 0
 
         # Leer el archivo y extraer los valores
         for val in archivo:
             cont_valores += 1
             if cont_valores == 4:
                 val_atom = int(val.strip())  # Número de átomos
-            if cont_valores == 6:
-                values_maxmin = [float(v) for v in val.rstrip("\n").split()]
-                largo_x = values_maxmin[1] - values_maxmin[0]  # Tomar el largo de X
+            if cont_valores in [6, 7, 8]:
+                values_maxmin.append([float(v) for v in val.rstrip("\n").split()])
             if cont_valores < 10:
                 datos.append(val)
             if cont_valores > 9:
                 valor_x1.append([float(x) for x in val.rstrip("\n").split()[2:5]])  # Extraer las coordenadas x, y, z
 
         print("Número de átomos:", val_atom)
-        # Recorrer cada átomo (líneas a partir de la línea 10)
-        valor_xminmax = largo_x
 
+        # Recorrer cada átomo (líneas a partir de la línea 10)
+        valor_xminmax = values_maxmin[0][1] - values_maxmin[0][0]
+
+        vertices_validos = []
         with open("process_files/F_prime_result.dump", "w") as archivo_salida:
             # Escribir los datos iniciales al archivo de salida
             for dato in datos:
@@ -317,27 +323,30 @@ def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo):
             for i in range(val_atom):
                 coordenadas = valor_x1[i]  # Extraer las coordenadas como lista de floats
                 # Calcular F_prima usando value1 y value2
-                valor = lambda x: (x / valor_xminmax) if valor_xminmax != 0 else 0.5
+                #valor = lambda x: (x / valor_xminmax) if valor_xminmax != 0 else 0.5
+                valor = lambda x: (x / valor_xminmax) + 1/2
                 ponderacion = valor(coordenadas[0])
                 F_prima = ponderacion * value1[i] + (1 - ponderacion) * value2[i]
 
                 # Evaluar si F_prima cumple la condición para incrementar según el tipo
+                cumple_condicion = False
                 if tipo == 1:  # F1 = < y F2 = <
                     if F_prima > epsilon1 and F_prima > epsilon2:
-                        archivo_salida.write(f"{incremental} 1 {coordenadas[2]:.3f} {coordenadas[1]:.3f} {coordenadas[0]:.3f}\n")
-                        incremental += 1
+                        cumple_condicion = True
                 elif tipo == 2:  # F1 = > y F2 = <
                     if F_prima < epsilon1 and F_prima > epsilon2:
-                        archivo_salida.write(f"{incremental} 1 {coordenadas[2]:.3f} {coordenadas[1]:.3f} {coordenadas[0]:.3f}\n")
-                        incremental += 1
+                        cumple_condicion = True
                 elif tipo == 3:  # F1 = < y F2 = >
                     if F_prima > epsilon1 and F_prima < epsilon2:
-                        archivo_salida.write(f"{incremental} 1 {coordenadas[2]:.3f} {coordenadas[1]:.3f} {coordenadas[0]:.3f}\n")
-                        incremental += 1
+                        cumple_condicion = True
                 elif tipo == 4:  # F1 = > y F2 = >
                     if F_prima < epsilon1 and F_prima < epsilon2:
-                        archivo_salida.write(f"{incremental} 1 {coordenadas[2]:.3f} {coordenadas[1]:.3f} {coordenadas[0]:.3f}\n")
-                        incremental += 1
+                        cumple_condicion = True
+
+                if cumple_condicion:
+                    archivo_salida.write(f"{incremental} 1 {coordenadas[0]:.3f} {coordenadas[1]:.3f} {coordenadas[2]:.3f}\n")
+                    incremental += 1
+                    vertices_validos.append(coordenadas)
 
         # Actualizar el número total de átomos en la línea correspondiente
         with open("process_files/F_prime_result.dump", "r+") as archivo_salida:
@@ -347,35 +356,51 @@ def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo):
             archivo_salida.writelines(archivo_salida_lines)
 
     print("Incremental final:", incremental)
-    # Generar archivo GCODE
-    with open("results/F_prime_result.gcode", "w") as gcode_salida:
-        gcode_salida.write("; GCODE generado a partir de F_prime_result.dump\n")
-        gcode_salida.write("G28 ; Home all axes\n")  # Llevar todos los ejes a origen
-        gcode_salida.write("G1 Z0.3 F7200 ; Levantar boquilla a 0.3mm\n")
 
-        for i in range(val_atom):
-            coordenada_x = valor_x1[i]
+    # Generar archivo STL usando numpy-stl solo con los vértices que cumplen la condición
+    if len(vertices_validos) < 4:
+        print("No hay suficientes vértices válidos para generar un STL.")
+        return
+    vertices = np.array(vertices_validos)
 
-            # Calcular F_prima usando la misma lógica
-            ponderacion = valor(coordenada_x[0])
-            F_prima = ponderacion * value1[i] + (1 - ponderacion) * value2[i]
+    # Crear una matriz 3D que represente el volumen a partir de los puntos
+    grid_size = 100  # Ajustar según la densidad de puntos deseada
+    volume = np.zeros((grid_size, grid_size, grid_size), dtype=np.float32)
 
-            # Generar movimiento GCODE basado en la condición del tipo
-            if tipo == 1 and F_prima > epsilon1 and F_prima > epsilon2:
-                gcode_salida.write(f"G1 X{coordenada_x[2]:.3f} Y0.000 Z0.300 F1500 ; Mover a X{coordenada_x[2]:.3f}\n")
-            elif tipo == 2 and F_prima < epsilon1 and F_prima > epsilon2:
-                gcode_salida.write(f"G1 X{coordenada_x[2]:.3f} Y0.000 Z0.300 F1500 ; Mover a X{coordenada_x[2]:.3f}\n")
-            elif tipo == 3 and F_prima > epsilon1 and F_prima < epsilon2:
-                gcode_salida.write(f"G1 X{coordenada_x[2]:.3f} Y0.000 Z0.300 F1500 ; Mover a X{coordenada_x[2]:.3f}\n")
-            elif tipo == 4 and F_prima < epsilon1 and F_prima < epsilon2:
-                gcode_salida.write(f"G1 X{coordenada_x[2]:.3f} Y0.000 Z0.300 F1500 ; Mover a X{coordenada_x[2]:.3f}\n")
+    # Normalizar las coordenadas a la grilla
+    min_coords = np.min(vertices, axis=0)
+    max_coords = np.max(vertices, axis=0)
+    norm_vertices = ((vertices - min_coords) / (max_coords - min_coords) * (grid_size - 1)).astype(int)
+    norm_vertices = np.clip(norm_vertices, 0, grid_size - 1)  # Asegurar que los puntos estén dentro de los límites
 
-        gcode_salida.write("M104 S0 ; Apagar extrusor\n")
-        gcode_salida.write("M140 S0 ; Apagar cama caliente\n")
-        gcode_salida.write("G28 X0 Y0 ; Home X Y\n")
-        gcode_salida.write("M84 ; Desactivar motores\n")
+    # Marcar los puntos en el volumen
+    for v in norm_vertices:
+        volume[v[0], v[1], v[2]] = 1.0
 
-    print(".Gcode Ok!")
+    volume[0, :, :] = 0
+    volume[-1, :, :] = 0
+    volume[:, 0, :] = 0
+    volume[:, -1, :] = 0
+    volume[:, :, 0] = 0
+    volume[:, :, -1] = 0
+
+    # Aplicar un suavizado al volumen para hacerlo más continuo
+    volume = gaussian_filter(volume, sigma=1.0)
+
+    # Usar Marching Cubes para crear una malla a partir del volumen
+    verts, faces, _, _ = measure.marching_cubes(volume, level=0.5)
+
+    # Crear el objeto de malla STL usando numpy-stl
+    nanopore_mesh = mesh.Mesh(np.zeros(faces.shape[0], dtype=mesh.Mesh.dtype))
+    for i, face in enumerate(faces):
+        for j in range(3):
+            nanopore_mesh.vectors[i][j] = verts[face[j]]
+    # Guardar el archivo STL
+    nanopore_mesh.save('results/F_prime_result.stl')
+    print(".STL generado correctamente!")
+
+
+
 
 
 def nocubicos(a,b,c,alpha,beta,gama):
@@ -400,11 +425,11 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
     fi = crear_fi(permutaciones)
     permutaciones2 = numerosiniciales(sqrt(valor_permutacionesE2),valor_permutacionesE2, nombre_variables2,value_x2,value_y2,value_z2,simbolo2)
     fi1 = crear_fi(permutaciones2)
-    if permutaciones == []:
+    if permutaciones == [] or permutaciones == [0,0,0]:
         error = "Error in Permutations\nThere is no combination for:\n"+str(valor_permutacionesE1)+" = x^2 + y^2 + z^2"
         error = "Error in Permutations\nThere is no combination for:\n"+str(valor_permutacionesE2)+" = x^2 + y^2 + z^2"
         return ("Permutations",error)
-    elif permutaciones2 == []:
+    elif permutaciones2 == [] or permutaciones2 == [0,0,0]:
         error = "Error in Permutations\nThere is no combination for:\n"+str(valor_permutacionesE1)+" = x^2 + y^2 + z^2"
         error = "Error in Permutations\nThere is no combination for:\n"+str(valor_permutacionesE2)+" = x^2 + y^2 + z^2"
         return ("Permutations",error)

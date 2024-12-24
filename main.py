@@ -27,9 +27,28 @@ class MyThread(QThread):
         self.nombre_variables = nombre_variables
         self.nombre_variables2 = nombre_variables2
 
+
     def run(self):
-        resultado = Soyarslan_no_cubico.funcion_app(self.archivo1, self.epsilon1,self.epsilon2, self.simbolo1,self.simbolo2 , self.valor_permutacionesE1,self.valor_permutacionesE2, self.nombre_resultante,self.nombre_resultante2,self.nombre_variables,self.nombre_variables2,self.valor_x,self.valor_y,self.valor_z,self.valor_x2,self.valor_y2,self.valor_z2)
-        self.resultado_signal.emit(resultado)
+        try:
+            resultado = Soyarslan_no_cubico.funcion_app(
+                self.archivo1, self.epsilon1, self.epsilon2,
+                self.simbolo1, self.simbolo2,
+                self.valor_permutacionesE1, self.valor_permutacionesE2,
+                self.nombre_resultante, self.nombre_resultante2,
+                self.nombre_variables, self.nombre_variables2,
+                self.valor_x, self.valor_y, self.valor_z,
+                self.valor_x2, self.valor_y2, self.valor_z2
+            )
+            if isinstance(resultado, tuple):  # Si ya es un tuple, úsalo directamente
+                self.resultado_signal.emit(resultado)
+            elif isinstance(resultado, str):  # Si es un string, envuélvelo como un mensaje de error
+                self.resultado_signal.emit(("Error", resultado))
+            else:
+                self.resultado_signal.emit(("Error", "Unexpected result format"))
+        except Exception as e:
+            self.resultado_signal.emit(("Error", f"An error occurred: {str(e)}"))
+
+       
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -68,14 +87,14 @@ class MainWindow(QWidget):
 
         # Layout titulo
         layout_titulo = QHBoxLayout()
-        label_Titulo = QLabel("Nanopore Structure")
+        label_Titulo = QLabel("Hybrid Nanopore Structure")
         label_Titulo.setStyleSheet(titulo)
         label_Titulo.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout_titulo.addWidget(label_Titulo)
 
         # Layout sub_titulo
         layout_sub_titulo = QHBoxLayout()
-        label_sub_titulo = QLabel("Hybrid Material Type")
+        label_sub_titulo = QLabel("Material Type")
         label_sub_titulo.setStyleSheet(sub_titulo)
         label_sub_titulo.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout_sub_titulo.addWidget(label_sub_titulo)
@@ -85,7 +104,7 @@ class MainWindow(QWidget):
         
         layout1 = QHBoxLayout()
         layout1.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        label_archivo1 = QLabel("Core File:")
+        label_archivo1 = QLabel("Input File:")
         label_archivo1.setStyleSheet(letra)
         label_archivo1.setFixedSize(106,36)
         archivo1_entry = QLineEdit()
@@ -354,9 +373,13 @@ class MainWindow(QWidget):
             return
         try:
             epsilon1 = float(E1_var.text())
-            epsilon2 = float(E2_var.text())
         except:
             QMessageBox.information(None, "Epsilon 1", "Incorrect Epsilon 1 Format")
+            return
+        try:
+            epsilon2 = float(E2_var.text())        
+        except:
+            QMessageBox.information(None, "Epsilon 2", "Incorrect Epsilon 2 Format")
             return
         try:
             valor_permutacionesE1 = int(entry_permutacion_var.text())
@@ -366,21 +389,33 @@ class MainWindow(QWidget):
             return
         try:
             value_x = float(valor_x_var.text())
+        except:
+            QMessageBox.information(None, "X F1", "Incorrect Coord Format")
+            return
+        try:
             value_x2 = float(valor_x2_var.text())
         except:
-            QMessageBox.information(None, "X", "Incorrect Coord Format")
+            QMessageBox.information(None, "X F2", "Incorrect Coord Format")
             return
         try:
             value_y = float(valor_y_var.text())
+        except:
+            QMessageBox.information(None, "Y F1", "Incorrect Coord Format")
+            return
+        try:
             value_y2 = float(valor_y2_var.text())
         except:
-            QMessageBox.information(None, "Y", "Incorrect Coord Format")
+            QMessageBox.information(None, "Y F2", "Incorrect Coord Format")
             return
         try:
             value_z = float(valor_z_var.text())
+        except:
+            QMessageBox.information(None, "Z F1", "Incorrect Coord Format")
+            return
+        try:
             value_z2 = float(valor_z2_var.text())
         except:
-            QMessageBox.information(None, "Z", "Incorrect Coord Format")
+            QMessageBox.information(None, "Z F2", "Incorrect Coord Format")
             return
         simbolo1 = str(boton_simbolo_var.text())
         simbolo2 = str(btn_Simbolo2_var.text())
@@ -495,15 +530,23 @@ class MainWindow(QWidget):
                 QMessageBox.information(None, "", "Epsilon 1, X, Y and Z must have data")
 
     def show_result(self, resultado):
-        self.ventana_procesando.setWindowTitle(resultado[0])
-        self.ventana_procesando.setText(resultado[1])
+        title, message = resultado  # Desempaquetar el tuple
+
+        if isinstance(message, tuple):  # Manejar el caso en que message sea un tuple por error
+            message = " ".join(map(str, message))  # Convertir el tuple a una cadena de texto
+
+        self.ventana_procesando.setWindowTitle(title)
+        self.ventana_procesando.setText(str(message))  # Convertir message explícitamente a string
         self.ventana_procesando.setStandardButtons(QMessageBox.StandardButton.Ok)
         self.ventana_procesando.adjustSize()
-        
-        
-        # Cerrar el hilo
+
+        # Mostrar el cuadro de diálogo
+        self.ventana_procesando.exec()
+
+        # Detener el hilo si terminó
         self.thread.quit()
         self.thread.wait()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
