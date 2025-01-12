@@ -425,11 +425,11 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
     fi = crear_fi(permutaciones)
     permutaciones2 = numerosiniciales(sqrt(valor_permutacionesE2),valor_permutacionesE2, nombre_variables2,value_x2,value_y2,value_z2,simbolo2)
     fi1 = crear_fi(permutaciones2)
-    if permutaciones == [] or permutaciones == [0,0,0]:
+    if permutaciones == [] or permutaciones == [(0,0,0)]:
         error = "Error in Permutations\nThere is no combination for:\n"+str(valor_permutacionesE1)+" = x^2 + y^2 + z^2"
         error = "Error in Permutations\nThere is no combination for:\n"+str(valor_permutacionesE2)+" = x^2 + y^2 + z^2"
         return ("Permutations",error)
-    elif permutaciones2 == [] or permutaciones2 == [0,0,0]:
+    elif permutaciones2 == [] or permutaciones2 == [(0,0,0)]:
         error = "Error in Permutations\nThere is no combination for:\n"+str(valor_permutacionesE1)+" = x^2 + y^2 + z^2"
         error = "Error in Permutations\nThere is no combination for:\n"+str(valor_permutacionesE2)+" = x^2 + y^2 + z^2"
         return ("Permutations",error)
