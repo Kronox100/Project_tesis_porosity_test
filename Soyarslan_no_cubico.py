@@ -9,7 +9,7 @@ from skimage import measure
     
     
     
-def Formula_mayores(qi,archivo1,epsilon1,fi):
+def Formula_mayores(qi,archivo1,epsilon1,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0):
     archivo = open(archivo1, "r")
     nuevo = open("process_files/file1.dump", "w")
     x =y=z = 0
@@ -19,6 +19,7 @@ def Formula_mayores(qi,archivo1,epsilon1,fi):
     nocubico = []
     ID = 0
     n = len(qi)
+    Lx = Ly = Lz = 1 #L Se inicializan las longitudes de x, y, z
     for linea in archivo:
         lineac += 1
         valor = 0
@@ -27,17 +28,33 @@ def Formula_mayores(qi,archivo1,epsilon1,fi):
             datos.append(linea)
             if lineac == 6:
                 x = float(r[1].rstrip()) - float(r[0])
+                Lx= x #L Se define longitud de x
             elif lineac == 7:
                 y = float(r[1].rstrip()) - float(r[0])
+                Ly = y #L Se define longitud de y
             elif lineac == 8:
                 z = float(r[1].rstrip()) - float(r[0])
+                Lz = z #L Se define longitud de z
                 nocubico = nocubicos(x,y,z,90,90,90)
         elif lineac > 9:
             for j in range(n):
                 valor += cos((qi[j][0]*((2*pi)/nocubico[0])*float(r[2]) + (qi[j][1]*((2*pi)/nocubico[1])*float(r[3]) + (qi[j][2]*((2*pi)/nocubico[2])*float(r[4]) + fi[j]))))#fi
             norm = sqrt(2/n)
             valor = valor * norm
-            if epsilon1 < valor:
+
+            #L Porosidad variable
+            x_atom = float(r[2])
+            y_atom = float(r[3])
+            z_atom = float(r[4])
+            epsilon_var = (
+                epsilon1
+                + (ax if ax else 0) * sin(((nx if nx else 0) * pi * x_atom) / Lx)
+                + (ay if ay else 0) * sin(((ny if ny else 0) * pi * y_atom) / Ly)
+                + (az if az else 0) * sin(((nz if nz else 0) * pi * z_atom) / Lz)
+            )
+
+            #L Se cambia epsilon1 por epsilon_var
+            if epsilon_var < valor:
                 ID += 1
                 texto = f"{ID} {r[1]} {r[2]} {r[3]} {r[4]}"
                 datos.append(texto)
@@ -57,7 +74,7 @@ def Formula_mayores(qi,archivo1,epsilon1,fi):
     #print(len(valor2),'valor2')
     return valor_mayores1
 
-def Formula_mayores2(qi,archivo1,epsilon1,fi):
+def Formula_mayores2(qi,archivo1,epsilon1,fi, ax2=0, nx2=0, ay2=0, ny2=0, az2=0, nz2=0):
     archivo = open(archivo1, "r")
     nuevo = open("process_files/file2.dump", "w")
     x =y=z = 0
@@ -67,6 +84,7 @@ def Formula_mayores2(qi,archivo1,epsilon1,fi):
     nocubico = []
     ID = 0
     n = len(qi)
+    Lx = Ly = Lz = 1 #L Se inicializan las longitudes de x, y, z
     for linea in archivo:
         lineac += 1
         valor = 0
@@ -75,17 +93,33 @@ def Formula_mayores2(qi,archivo1,epsilon1,fi):
             datos.append(linea)
             if lineac == 6:
                 x = float(r[1].rstrip()) - float(r[0])
+                Lx= x #L Se define longitud de x
             elif lineac == 7:
                 y = float(r[1].rstrip()) - float(r[0])
+                Ly= y #L Se define longitud de y
             elif lineac == 8:
                 z = float(r[1].rstrip()) - float(r[0])
                 nocubico = nocubicos(x,y,z,90,90,90)
+                Lz= z #L Se define longitud de z
         elif lineac > 9:
             for j in range(n):
                 valor += cos((qi[j][0]*((2*pi)/nocubico[0])*float(r[2]) + (qi[j][1]*((2*pi)/nocubico[1])*float(r[3]) + (qi[j][2]*((2*pi)/nocubico[2])*float(r[4]) + fi[j]))))#fi
             norm = sqrt(2/n)
             valor = valor * norm
-            if epsilon1 < valor:
+
+            #L Porosidad variable
+            x_atom = float(r[2])
+            y_atom = float(r[3])
+            z_atom = float(r[4])
+            epsilon_var = (
+                epsilon1
+                + (ax2 if ax2 else 0) * sin(((nx2 if nx2 else 0) * pi * x_atom) / Lx)
+                + (ay2 if ay2 else 0) * sin(((ny2 if ny2 else 0) * pi * y_atom) / Ly)
+                + (az2 if az2 else 0) * sin(((nz2 if nz2 else 0) * pi * z_atom) / Lz)
+            )
+
+            #L Se cambia epsilon1 por epsilon_var
+            if epsilon_var < valor:
                 ID += 1
                 texto = f"{ID} {r[1]} {r[2]} {r[3]} {r[4]}"
                 datos.append(texto)
@@ -104,7 +138,7 @@ def Formula_mayores2(qi,archivo1,epsilon1,fi):
     return valor_mayores2
 
 
-def Formula_menores(qi,archivo1,epsilon1,fi):
+def Formula_menores(qi,archivo1,epsilon1,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0):
     archivo = open(archivo1, "r")
     nuevo = open("process_files/file1.dump", "w")
     x =y=z = 0
@@ -114,6 +148,7 @@ def Formula_menores(qi,archivo1,epsilon1,fi):
     nocubico = []
     ID = 0
     n = len(qi)
+    Lx = Ly = Lz = 1 #L Se inicializan las longitudes de x, y, z
     for linea in archivo:
         lineac += 1
         valor = 0
@@ -122,17 +157,33 @@ def Formula_menores(qi,archivo1,epsilon1,fi):
             datos.append(linea)
             if lineac == 6:
                 x = float(r[1].rstrip()) - float(r[0])
+                Lx= x #L Se define longitud de x
             elif lineac == 7:
                 y = float(r[1].rstrip()) - float(r[0])
+                Ly= y #L Se define longitud de y
             elif lineac == 8:
                 z = float(r[1].rstrip()) - float(r[0])
+                Lz= z #L Se define longitud de z
                 nocubico = nocubicos(x,y,z,90,90,90)
         elif lineac > 9:
             for j in range(n):
                 valor += cos((qi[j][0]*((2*pi)/nocubico[0])*float(r[2]) + (qi[j][1]*((2*pi)/nocubico[1])*float(r[3]) + (qi[j][2]*((2*pi)/nocubico[2])*float(r[4]) + fi[j]))))#fi
             norm = sqrt(2/n)
             valor = valor * norm
-            if epsilon1 > valor:
+
+            #L Porosidad variable
+            x_atom = float(r[2])
+            y_atom = float(r[3])
+            z_atom = float(r[4])
+            epsilon_var = (
+                epsilon1
+                + (ax if ax else 0) * sin(((nx if nx else 0) * pi * x_atom) / Lx)
+                + (ay if ay else 0) * sin(((ny if ny else 0) * pi * y_atom) / Ly)
+                + (az if az else 0) * sin(((nz if nz else 0) * pi * z_atom) / Lz)
+            )
+
+            #L Se cambia epsilon1 por epsilon_var
+            if epsilon_var > valor:
                 ID += 1
                 texto = f"{ID} {r[1]} {r[2]} {r[3]} {r[4]}"
                 datos.append(texto)
@@ -150,7 +201,7 @@ def Formula_menores(qi,archivo1,epsilon1,fi):
     nuevo.close()
     return valor_menores1
 
-def Formula_menores2(qi,archivo1,epsilon1,fi):
+def Formula_menores2(qi,archivo1,epsilon1,fi, ax2=0, nx2=0, ay2=0, ny2=0, az2=0, nz2=0):
     archivo = open(archivo1, "r")
     nuevo = open("process_files/file2.dump", "w")
     x =y=z = 0
@@ -160,6 +211,7 @@ def Formula_menores2(qi,archivo1,epsilon1,fi):
     nocubico = []
     ID = 0
     n = len(qi)
+    Lx = Ly = Lz = 1 #L Se inicializan las longitudes de x, y, z
     for linea in archivo:
         lineac += 1
         valor = 0
@@ -168,17 +220,33 @@ def Formula_menores2(qi,archivo1,epsilon1,fi):
             datos.append(linea)
             if lineac == 6:
                 x = float(r[1].rstrip()) - float(r[0])
+                Lx= x #L Se define longitud de x
             elif lineac == 7:
                 y = float(r[1].rstrip()) - float(r[0])
+                Ly= y #L Se define longitud de y
             elif lineac == 8:
                 z = float(r[1].rstrip()) - float(r[0])
+                Lz= z #L Se define longitud de z
                 nocubico = nocubicos(x,y,z,90,90,90)
         elif lineac > 9:
             for j in range(n):
                 valor += cos((qi[j][0]*((2*pi)/nocubico[0])*float(r[2]) + (qi[j][1]*((2*pi)/nocubico[1])*float(r[3]) + (qi[j][2]*((2*pi)/nocubico[2])*float(r[4]) + fi[j]))))#fi
             norm = sqrt(2/n)
             valor = valor * norm
-            if epsilon1 > valor:
+            
+            #L Porosidad variable
+            x_atom = float(r[2])
+            y_atom = float(r[3])
+            z_atom = float(r[4])
+            epsilon_var = (
+                epsilon1
+                + (ax2 if ax2 else 0) * sin(((nx2 if nx2 else 0) * pi * x_atom) / Lx)
+                + (ay2 if ay2 else 0) * sin(((ny2 if ny2 else 0) * pi * y_atom) / Ly)
+                + (az2 if az2 else 0) * sin(((nz2 if nz2 else 0) * pi * z_atom) / Lz)
+            )
+
+            #L Se cambia epsilon1 por epsilon_var
+            if epsilon_var > valor:
                 ID += 1
                 texto = f"{ID} {r[1]} {r[2]} {r[3]} {r[4]}"
                 datos.append(texto)
@@ -418,7 +486,8 @@ def crear_fi(permutaciones):
     return fi
 
  
-def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacionesE1, valor_permutacionesE2, nombre_resultante,nombre_resultante2, nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2):
+def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacionesE1, valor_permutacionesE2, nombre_resultante,nombre_resultante2, nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2,
+                ax=None, nx=None, ay=None, ny=None, az=None, nz=None,ax2=None, nx2=None, ay2=None, ny2=None, az2=None, nz2=None):
     if not os.path.exists("process_files"):
             os.makedirs("process_files")
     permutaciones = numerosiniciales(sqrt(valor_permutacionesE1),valor_permutacionesE1, nombre_variables,value_x,value_y,value_z,simbolo1)
@@ -439,8 +508,8 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
                 try:
                     print("F1 = < ---- F2 = <")
                     type=1
-                    mayor1=Formula_mayores(permutaciones,archivo1,epsilon1,fi)
-                    mayor2=Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1)
+                    mayor1=Formula_mayores(permutaciones,archivo1,epsilon1,fi, ax, nx, ay, ny, az, nz)
+                    mayor2=Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1, ax2, nx2, ay2, ny2, az2, nz2)
                     hybrid_function(archivo1, mayor1,mayor2, epsilon1, epsilon2,type)
                     #F_prima = lambda_ * mayor1 + (1 - lambda_) * mayor2
 
@@ -455,8 +524,8 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
                 try:
                     print("F1 = > ---- F2 = <")
                     type=2
-                    menor1 = Formula_menores(permutaciones,archivo1,epsilon1,fi)
-                    mayor2= Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1)
+                    menor1 = Formula_menores(permutaciones,archivo1,epsilon1,fi, ax, nx, ay, ny, az, nz)
+                    mayor2= Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1, ax2, nx2, ay2, ny2, az2, nz2)
                     hybrid_function(archivo1, menor1,mayor2, epsilon1, epsilon2,type)
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
@@ -484,7 +553,7 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
                     type=4
                     menor1=Formula_menores(permutaciones,archivo1,epsilon1,fi)
                     menor2=Formula_menores2(permutaciones2,archivo1,epsilon2,fi1)
-                    hybrid_function(archivo1, mayor1,menor2, epsilon1, epsilon2,type)
+                    hybrid_function(archivo1, menor1,menor2, epsilon1, epsilon2,type) #L CORRECCION?? "mayor1" deberia ser "menor1"???
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
                 aleacion("file1.dump",nombre_resultante,nombre_variables)

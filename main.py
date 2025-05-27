@@ -7,7 +7,9 @@ import Soyarslan_no_cubico as Soyarslan_no_cubico
 class MyThread(QThread):
     resultado_signal = pyqtSignal(tuple)
 
-    def __init__(self, archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2, nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2):
+    def __init__(self, archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2,
+                 nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,
+                 value_z,value_x2,value_y2,value_z2,ax, nx, ay, ny, az, nz, ax2, nx2, ay2, ny2, az2, nz2):
         super().__init__()
         self.archivo1 = archivo1
         self.epsilon1 = epsilon1
@@ -26,6 +28,19 @@ class MyThread(QThread):
         self.nombre_resultante2 = nombre_resultante2
         self.nombre_variables = nombre_variables
         self.nombre_variables2 = nombre_variables2
+        #L Nuevos argumentos senoidales
+        self.ax = ax
+        self.nx = nx
+        self.ay = ay
+        self.ny = ny
+        self.az = az
+        self.nz = nz
+        self.ax2 = ax2
+        self.nx2 = nx2
+        self.ay2 = ay2
+        self.ny2 = ny2
+        self.az2 = az2
+        self.nz2 = nz2
 
 
     def run(self):
@@ -37,7 +52,9 @@ class MyThread(QThread):
                 self.nombre_resultante, self.nombre_resultante2,
                 self.nombre_variables, self.nombre_variables2,
                 self.valor_x, self.valor_y, self.valor_z,
-                self.valor_x2, self.valor_y2, self.valor_z2
+                self.valor_x2, self.valor_y2, self.valor_z2,
+                self.ax, self.nx, self.ay, self.ny, self.az, self.nz,
+                self.ax2, self.nx2, self.ay2, self.ny2, self.az2, self.nz2
             )
             if isinstance(resultado, tuple):  # Si ya es un tuple, úsalo directamente
                 self.resultado_signal.emit(resultado)
@@ -184,6 +201,58 @@ class MainWindow(QWidget):
         layout4.addWidget(Z_entry)
 
         layout_seccion2.addLayout(layout2)
+        # Campos senoidales para E1
+        layout_senoidal1 = QHBoxLayout()
+        label_ax = QLabel("Ax:")
+        label_ax.setStyleSheet(letra)
+        entry_ax = QLineEdit()
+        entry_ax.setStyleSheet(borde_entry)
+        entry_ax.setFixedSize(80, 36)
+
+        label_nx = QLabel("nx:")
+        label_nx.setStyleSheet(letra)
+        entry_nx = QLineEdit()
+        entry_nx.setStyleSheet(borde_entry)
+        entry_nx.setFixedSize(80, 36)
+
+        label_ay = QLabel("Ay:")
+        label_ay.setStyleSheet(letra)
+        entry_ay = QLineEdit()
+        entry_ay.setStyleSheet(borde_entry)
+        entry_ay.setFixedSize(80, 36)
+
+        label_ny = QLabel("ny:")
+        label_ny.setStyleSheet(letra)
+        entry_ny = QLineEdit()
+        entry_ny.setStyleSheet(borde_entry)
+        entry_ny.setFixedSize(80, 36)
+
+        label_az = QLabel("Az:")
+        label_az.setStyleSheet(letra)
+        entry_az = QLineEdit()
+        entry_az.setStyleSheet(borde_entry)
+        entry_az.setFixedSize(80, 36)
+
+        label_nz = QLabel("nz:")
+        label_nz.setStyleSheet(letra)
+        entry_nz = QLineEdit()
+        entry_nz.setStyleSheet(borde_entry)
+        entry_nz.setFixedSize(80, 36)
+
+        layout_senoidal1.addWidget(label_ax)
+        layout_senoidal1.addWidget(entry_ax)
+        layout_senoidal1.addWidget(label_nx)
+        layout_senoidal1.addWidget(entry_nx)
+        layout_senoidal1.addWidget(label_ay)
+        layout_senoidal1.addWidget(entry_ay)
+        layout_senoidal1.addWidget(label_ny)
+        layout_senoidal1.addWidget(entry_ny)
+        layout_senoidal1.addWidget(label_az)
+        layout_senoidal1.addWidget(entry_az)
+        layout_senoidal1.addWidget(label_nz)
+        layout_senoidal1.addWidget(entry_nz)
+
+        layout_seccion2.addLayout(layout_senoidal1)
         layout_seccion2.addLayout(layout3)
         layout_seccion2.addLayout(layout4)
 
@@ -249,6 +318,61 @@ class MainWindow(QWidget):
         F2_CoordsXYZ.addWidget(Z2_entry)
 
         layout_f2.addLayout(F2_layout)
+
+        # Campos senoidales para E2
+        layout_senoidal2 = QHBoxLayout()
+        label_ax2 = QLabel("Ax:")
+        label_ax2.setStyleSheet(letra)
+        entry_ax2 = QLineEdit()
+        entry_ax2.setStyleSheet(borde_entry)
+        entry_ax2.setFixedSize(80, 36)
+
+        label_nx2 = QLabel("nx:")
+        label_nx2.setStyleSheet(letra)
+        entry_nx2 = QLineEdit()
+        entry_nx2.setStyleSheet(borde_entry)
+        entry_nx2.setFixedSize(80, 36)
+
+        label_ay2 = QLabel("Ay:")
+        label_ay2.setStyleSheet(letra)
+        entry_ay2 = QLineEdit()
+        entry_ay2.setStyleSheet(borde_entry)
+        entry_ay2.setFixedSize(80, 36)
+
+        label_ny2 = QLabel("ny:")
+        label_ny2.setStyleSheet(letra)
+        entry_ny2 = QLineEdit()
+        entry_ny2.setStyleSheet(borde_entry)
+        entry_ny2.setFixedSize(80, 36)
+
+        label_az2 = QLabel("Az:")
+        label_az2.setStyleSheet(letra)
+        entry_az2 = QLineEdit()
+        entry_az2.setStyleSheet(borde_entry)
+        entry_az2.setFixedSize(80, 36)
+
+        label_nz2 = QLabel("nz:")
+        label_nz2.setStyleSheet(letra)
+        entry_nz2 = QLineEdit()
+        entry_nz2.setStyleSheet(borde_entry)
+        entry_nz2.setFixedSize(80, 36)
+
+        layout_senoidal2.addWidget(label_ax2)
+        layout_senoidal2.addWidget(entry_ax2)
+        layout_senoidal2.addWidget(label_nx2)
+        layout_senoidal2.addWidget(entry_nx2)
+        layout_senoidal2.addWidget(label_ay2)
+        layout_senoidal2.addWidget(entry_ay2)
+        layout_senoidal2.addWidget(label_ny2)
+        layout_senoidal2.addWidget(entry_ny2)
+        layout_senoidal2.addWidget(label_az2)
+        layout_senoidal2.addWidget(entry_az2)
+        layout_senoidal2.addWidget(label_nz2)
+        layout_senoidal2.addWidget(entry_nz2)
+
+        layout_f2.addLayout(layout_senoidal2)
+
+
         layout_f2.addLayout(F2_Coords)
         layout_f2.addLayout(F2_CoordsXYZ)
 
@@ -302,7 +426,10 @@ class MainWindow(QWidget):
 
         layout7 = QHBoxLayout()
         boton_confirmar = QPushButton("Confirm")
-        boton_confirmar.clicked.connect(lambda: self.confirmar(archivo1_entry, epsilon1_entry,E2_entry,boton_simbolo,btn_Simbolo2, entry_permutacion,entry_2permutacion, nombre_archivo_entry,X_entry, Y_entry,Z_entry,X2_entry, Y2_entry,Z2_entry))
+        boton_confirmar.clicked.connect(lambda: self.confirmar(archivo1_entry, epsilon1_entry, E2_entry, boton_simbolo, btn_Simbolo2,
+                                                               entry_permutacion, entry_2permutacion, nombre_archivo_entry,X_entry, Y_entry, Z_entry, 
+                                                               X2_entry, Y2_entry, Z2_entry,entry_ax, entry_nx, entry_ay, entry_ny, entry_az, entry_nz,
+                                                               entry_ax2, entry_nx2, entry_ay2, entry_ny2, entry_az2, entry_nz2))
         boton_confirmar.setStyleSheet(botones_confirmar)
         boton_confirmar.setFixedSize(98,36)
         layout7.addWidget(boton_confirmar)
@@ -345,7 +472,11 @@ class MainWindow(QWidget):
         else:
             label_valor_epsilon1.setText("E2")
 
-    def confirmar(self,archivo1_entry, epsilon1_entry,E2_entry,boton_simbolo,btn_Simbolo2, entry_permutacion,entry_2permutacion, nombre_archivo_entry,X_entry, Y_entry,Z_entry,X2_entry, Y2_entry,Z2_entry):
+    def confirmar(self, archivo1_entry, epsilon1_entry, E2_entry, boton_simbolo, btn_Simbolo2,
+              entry_permutacion, entry_2permutacion, nombre_archivo_entry,
+              X_entry, Y_entry, Z_entry, X2_entry, Y2_entry, Z2_entry,
+              entry_ax, entry_nx, entry_ay, entry_ny, entry_az, entry_nz,
+              entry_ax2, entry_nx2, entry_ay2, entry_ny2, entry_az2, entry_nz2):
         mensaje = QMessageBox()
         mensaje.setWindowTitle("Confirmation")
         mensaje.setText("The data is correct?")
@@ -356,11 +487,20 @@ class MainWindow(QWidget):
         reply = mensaje.exec()
         if reply == QMessageBox.StandardButton.Yes:
             print("The operation was confirmed")
-            self.confirmar_operacion(archivo1_entry, epsilon1_entry,E2_entry,boton_simbolo,btn_Simbolo2, entry_permutacion,entry_2permutacion, nombre_archivo_entry,X_entry, Y_entry,Z_entry,X2_entry, Y2_entry,Z2_entry)
+            self.confirmar_operacion(archivo1_entry, epsilon1_entry, E2_entry, boton_simbolo, btn_Simbolo2,
+                                     entry_permutacion, entry_2permutacion, nombre_archivo_entry,X_entry, 
+                                     Y_entry, Z_entry, X2_entry, Y2_entry, Z2_entry,entry_ax, entry_nx, 
+                                     entry_ay, entry_ny, entry_az, entry_nz,entry_ax2, entry_nx2, entry_ay2,
+                                     entry_ny2, entry_az2, entry_nz2)
         else:
             print("The operation was canceled")
 
-    def confirmar_operacion(self,archivo1_var, E1_var,E2_var, boton_simbolo_var,btn_Simbolo2_var, entry_permutacion_var, entry_2permutacion, nombre_archivo_entry,valor_x_var,valor_y_var,valor_z_var,valor_x2_var,valor_y2_var,valor_z2_var):
+    def confirmar_operacion(self,archivo1_var, E1_var,E2_var, boton_simbolo_var,btn_Simbolo2_var, 
+                            entry_permutacion_var, entry_2permutacion, nombre_archivo_entry,valor_x_var,
+                            valor_y_var,valor_z_var,valor_x2_var,valor_y2_var,valor_z2_var,
+                            entry_ax=None, entry_nx=None, entry_ay=None, entry_ny=None, entry_az=None, entry_nz=None,
+                            entry_ax2=None, entry_nx2=None, entry_ay2=None, entry_ny2=None, entry_az2=None, 
+                            entry_nz2=None):
         if not os.path.exists("results"):
             os.makedirs("results")
         try:
@@ -417,6 +557,94 @@ class MainWindow(QWidget):
         except:
             QMessageBox.information(None, "Z F2", "Incorrect Coord Format")
             return
+        
+        #L Validación de campos senoidales para E1
+        try:
+            ax = float(entry_ax.text()) if entry_ax and entry_ax.text() else 0
+        except:
+            QMessageBox.information(None, "Ax", "Incorrect Ax Format")
+            return
+        try:
+            nx = int(entry_nx.text()) if entry_nx and entry_nx.text() else 0
+        except:
+            QMessageBox.information(None, "nx", "Incorrect nx Format")
+            return
+        try:
+            ay = float(entry_ay.text()) if entry_ay and entry_ay.text() else 0
+        except:
+            QMessageBox.information(None, "Ay", "Incorrect Ay Format")
+            return
+        try:
+            ny = int(entry_ny.text()) if entry_ny and entry_ny.text() else 0
+        except:
+            QMessageBox.information(None, "ny", "Incorrect ny Format")
+            return
+        try:
+            az = float(entry_az.text()) if entry_az and entry_az.text() else 0
+        except:
+            QMessageBox.information(None, "Az", "Incorrect Az Format")
+            return
+        try:
+            nz = int(entry_nz.text()) if entry_nz and entry_nz.text() else 0
+        except:
+            QMessageBox.information(None, "nz", "Incorrect nz Format")
+            return
+
+        #L Validación de campos senoidales para E2
+        try:
+            ax2 = float(entry_ax2.text()) if entry_ax2 and entry_ax2.text() else 0
+        except:
+            QMessageBox.information(None, "Ax2", "Incorrect Ax2 Format")
+            return
+        try:
+            nx2 = int(entry_nx2.text()) if entry_nx2 and entry_nx2.text() else 0
+        except:
+            QMessageBox.information(None, "nx2", "Incorrect nx2 Format")
+            return
+        try:
+            ay2 = float(entry_ay2.text()) if entry_ay2 and entry_ay2.text() else 0
+        except:
+            QMessageBox.information(None, "Ay2", "Incorrect Ay2 Format")
+            return
+        try:
+            ny2 = int(entry_ny2.text()) if entry_ny2 and entry_ny2.text() else 0
+        except:
+            QMessageBox.information(None, "ny2", "Incorrect ny2 Format")
+            return
+        try:
+            az2 = float(entry_az2.text()) if entry_az2 and entry_az2.text() else 0
+        except:
+            QMessageBox.information(None, "Az2", "Incorrect Az2 Format")
+            return
+        try:
+            nz2 = int(entry_nz2.text()) if entry_nz2 and entry_nz2.text() else 0
+        except:
+            QMessageBox.information(None, "nz2", "Incorrect nz2 Format")
+            return
+
+        #L Obtener valores senoidales para E1
+        ax = float(entry_ax.text()) if entry_ax and entry_ax.text() else 0
+        nx = int(entry_nx.text()) if entry_nx and entry_nx.text() else 0
+        ay = float(entry_ay.text()) if entry_ay and entry_ay.text() else 0
+        ny = int(entry_ny.text()) if entry_ny and entry_ny.text() else 0
+        az = float(entry_az.text()) if entry_az and entry_az.text() else 0
+        nz = int(entry_nz.text()) if entry_nz and entry_nz.text() else 0
+
+        #L Obtener valores senoidales para E2
+        ax2 = float(entry_ax2.text()) if entry_ax2 and entry_ax2.text() else 0
+        nx2 = int(entry_nx2.text()) if entry_nx2 and entry_nx2.text() else 0
+        ay2 = float(entry_ay2.text()) if entry_ay2 and entry_ay2.text() else 0
+        ny2 = int(entry_ny2.text()) if entry_ny2 and entry_ny2.text() else 0
+        az2 = float(entry_az2.text()) if entry_az2 and entry_az2.text() else 0
+        nz2 = int(entry_nz2.text()) if entry_nz2 and entry_nz2.text() else 0
+
+        #L Imprimir los valores capturados:
+        print("Valores senoidales E1:", ax, nx, ay, ny, az, nz)
+        print("Valores senoidales E2:", ax2, nx2, ay2, ny2, az2, nz2)
+
+        QMessageBox.information(None, "Senoidales capturados",
+            f"E1: {ax}, {nx}, {ay}, {ny}, {az}, {nz}\nE2: {ax2}, {nx2}, {ay2}, {ny2}, {az2}, {nz2}")
+
         simbolo1 = str(boton_simbolo_var.text())
         simbolo2 = str(btn_Simbolo2_var.text())
         nombre_variables = str(nombre_archivo_entry.text())
@@ -445,7 +673,8 @@ class MainWindow(QWidget):
 
                 # Proceso en otro hilo
                 self.thread = MyThread(archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2, 
-                                        nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2)
+                                        nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2,
+                                        ax, nx, ay, ny, az, nz, ax2, nx2, ay2, ny2, az2, nz2)
                 self.thread.resultado_signal.connect(self.show_result)
                 self.thread.start()
             else:
@@ -471,7 +700,8 @@ class MainWindow(QWidget):
 
                 # Proceso en otro hilo
                 self.thread = MyThread(archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2, 
-                                        nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2)
+                                        nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2,
+                                        ax, nx, ay, ny, az, nz, ax2, nx2, ay2, ny2, az2, nz2)
                 self.thread.resultado_signal.connect(self.show_result)
                 self.thread.start()
             else:
@@ -497,7 +727,8 @@ class MainWindow(QWidget):
 
                 # Proceso en otro hilo
                 self.thread = MyThread(archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2, 
-                                        nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2)
+                                        nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2,
+                                        ax, nx, ay, ny, az, nz, ax2, nx2, ay2, ny2, az2, nz2)
                 self.thread.resultado_signal.connect(self.show_result)
                 self.thread.start()
             else:
@@ -523,7 +754,8 @@ class MainWindow(QWidget):
 
                 # Proceso en otro hilo
                 self.thread = MyThread(archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2, 
-                                        nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2)
+                                        nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2,
+                                        ax, nx, ay, ny, az, nz, ax2, nx2, ay2, ny2, az2, nz2)
                 self.thread.resultado_signal.connect(self.show_result)
                 self.thread.start()
             else:
