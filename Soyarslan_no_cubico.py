@@ -46,6 +46,9 @@ def Formula_mayores(qi,archivo1,epsilon1,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0)
             x_atom = float(r[2])
             y_atom = float(r[3])
             z_atom = float(r[4])
+
+            print(f"epsilon={epsilon1}, ax={ax}, nx={nx}, ay={ay}, ny={ny}, az={az}, nz={nz}, Lx={Lx}, Ly={Ly}, Lz={Lz}, x_atom={x_atom}, y_atom={y_atom}, z_atom={z_atom}")
+
             epsilon_var = (
                 epsilon1
                 + (ax if ax else 0) * sin(((nx if nx else 0) * pi * x_atom) / Lx)
@@ -74,7 +77,7 @@ def Formula_mayores(qi,archivo1,epsilon1,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0)
     #print(len(valor2),'valor2')
     return valor_mayores1
 
-def Formula_mayores2(qi,archivo1,epsilon1,fi, ax2=0, nx2=0, ay2=0, ny2=0, az2=0, nz2=0):
+def Formula_mayores2(qi,archivo1,epsilon2,fi, ax2=0, nx2=0, ay2=0, ny2=0, az2=0, nz2=0): #L CORRECCION epsilon1 se cambia por epsilon2
     archivo = open(archivo1, "r")
     nuevo = open("process_files/file2.dump", "w")
     x =y=z = 0
@@ -111,8 +114,11 @@ def Formula_mayores2(qi,archivo1,epsilon1,fi, ax2=0, nx2=0, ay2=0, ny2=0, az2=0,
             x_atom = float(r[2])
             y_atom = float(r[3])
             z_atom = float(r[4])
+
+            print(f"epsilon={epsilon2}, ax2={ax2}, nx2={nx2}, ay2={ay2}, ny2={ny2}, az2={az2}, nz2={nz2}, Lx={Lx}, Ly={Ly}, Lz={Lz}, x_atom={x_atom}, y_atom={y_atom}, z_atom={z_atom}")
+
             epsilon_var = (
-                epsilon1
+                epsilon2
                 + (ax2 if ax2 else 0) * sin(((nx2 if nx2 else 0) * pi * x_atom) / Lx)
                 + (ay2 if ay2 else 0) * sin(((ny2 if ny2 else 0) * pi * y_atom) / Ly)
                 + (az2 if az2 else 0) * sin(((nz2 if nz2 else 0) * pi * z_atom) / Lz)
@@ -175,6 +181,9 @@ def Formula_menores(qi,archivo1,epsilon1,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0)
             x_atom = float(r[2])
             y_atom = float(r[3])
             z_atom = float(r[4])
+
+            print(f"epsilon={epsilon1}, ax={ax}, nx={nx}, ay={ay}, ny={ny}, az={az}, nz={nz}, Lx={Lx}, Ly={Ly}, Lz={Lz}, x_atom={x_atom}, y_atom={y_atom}, z_atom={z_atom}")
+
             epsilon_var = (
                 epsilon1
                 + (ax if ax else 0) * sin(((nx if nx else 0) * pi * x_atom) / Lx)
@@ -201,7 +210,7 @@ def Formula_menores(qi,archivo1,epsilon1,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0)
     nuevo.close()
     return valor_menores1
 
-def Formula_menores2(qi,archivo1,epsilon1,fi, ax2=0, nx2=0, ay2=0, ny2=0, az2=0, nz2=0):
+def Formula_menores2(qi,archivo1,epsilon2,fi, ax2=0, nx2=0, ay2=0, ny2=0, az2=0, nz2=0): #L CORRECCION epsilon1 se cambia por epsilon2
     archivo = open(archivo1, "r")
     nuevo = open("process_files/file2.dump", "w")
     x =y=z = 0
@@ -238,8 +247,11 @@ def Formula_menores2(qi,archivo1,epsilon1,fi, ax2=0, nx2=0, ay2=0, ny2=0, az2=0,
             x_atom = float(r[2])
             y_atom = float(r[3])
             z_atom = float(r[4])
+
+            print(f"epsilon={epsilon2}, ax2={ax2}, nx2={nx2}, ay2={ay2}, ny2={ny2}, az2={az2}, nz2={nz2}, Lx={Lx}, Ly={Ly}, Lz={Lz}, x_atom={x_atom}, y_atom={y_atom}, z_atom={z_atom}")
+
             epsilon_var = (
-                epsilon1
+                epsilon2
                 + (ax2 if ax2 else 0) * sin(((nx2 if nx2 else 0) * pi * x_atom) / Lx)
                 + (ay2 if ay2 else 0) * sin(((ny2 if ny2 else 0) * pi * y_atom) / Ly)
                 + (az2 if az2 else 0) * sin(((nz2 if nz2 else 0) * pi * z_atom) / Lz)
