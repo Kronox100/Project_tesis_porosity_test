@@ -368,7 +368,8 @@ def numerosiniciales(H,H2,nombre_variables,valor_x,valor_y,valor_z,simbolo): ##I
     n_permutaciones = calcular_con_operadores(permutaciones,valor_x,valor_y,valor_z,simbolo)
     return n_permutaciones
 
-def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo):
+def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo, nx_lambda=0, ny_lambda=0, nz_lambda=0):
+    Lx, Ly, Lz = obtener_dimensiones_caja(archivo1)
     with open(archivo1, "r") as archivo:
         cont_valores = 0
         values_maxmin = []
@@ -399,13 +400,17 @@ def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo):
             for dato in datos:
                 archivo_salida.write(dato)
 
-            # Iterar sobre cada átomo
+            #L Iterar sobre cada átomo
             for i in range(val_atom):
-                coordenadas = valor_x1[i]  # Extraer las coordenadas como lista de floats
-                # Calcular F_prima usando value1 y value2
-                #valor = lambda x: (x / valor_xminmax) if valor_xminmax != 0 else 0.5
-                valor = lambda x: (x / valor_xminmax) + 1/2
-                ponderacion = valor(coordenadas[0])
+                coordenadas = valor_x1[i]  # [x, y, z]
+                # Calcula lambda para este átomo
+                lambda_val = lambda_xyz(
+                    coordenadas[0], coordenadas[1], coordenadas[2],
+                    nx_lambda, ny_lambda, nz_lambda, Lx, Ly, Lz
+                )
+                # Puedes usar lambda_val como factor de mezcla o umbral
+                # Ejemplo: modificar ponderación o F_prima
+                ponderacion = (lambda_val + 3) / 6  # Normaliza a [0,1]
                 F_prima = ponderacion * value1[i] + (1 - ponderacion) * value2[i]
 
                 # Evaluar si F_prima cumple la condición para incrementar según el tipo
@@ -479,10 +484,6 @@ def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo):
     nanopore_mesh.save('results/F_prime_result.stl')
     print(".STL generado correctamente!")
 
-
-
-
-
 def nocubicos(a,b,c,alpha,beta,gama):
     matriz = []
     matriz.append(a)
@@ -497,9 +498,26 @@ def crear_fi(permutaciones):
         fi.append(randfloat(0, 2*pi))
     return fi
 
+#L Obtener dimensiones de la caja
+def obtener_dimensiones_caja(archivo1):
+    with open(archivo1, "r") as f:
+        lines = [next(f) for _ in range(9)]
+        Lx = float(lines[5].split()[1]) - float(lines[5].split()[0])
+        Ly = float(lines[6].split()[1]) - float(lines[6].split()[0])
+        Lz = float(lines[7].split()[1]) - float(lines[7].split()[0])
+    return Lx, Ly, Lz
+
+#L Funcion lambda
+def lambda_xyz(x, y, z, nx, ny, nz, Lx, Ly, Lz):
+    return (
+        np.sin(2 * np.pi * nx * x / Lx) +
+        np.sin(2 * np.pi * ny * y / Ly) +
+        np.sin(2 * np.pi * nz * z / Lz)
+    )
+
  
 def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacionesE1, valor_permutacionesE2, nombre_resultante,nombre_resultante2, nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2,
-                ax=None, nx=None, ay=None, ny=None, az=None, nz=None,ax2=None, nx2=None, ay2=None, ny2=None, az2=None, nz2=None):
+                ax=None, nx=None, ay=None, ny=None, az=None, nz=None,ax2=None, nx2=None, ay2=None, ny2=None, az2=None, nz2=None, nx_lambda=0, ny_lambda=0, nz_lambda=0):
     if not os.path.exists("process_files"):
             os.makedirs("process_files")
     permutaciones = numerosiniciales(sqrt(valor_permutacionesE1),valor_permutacionesE1, nombre_variables,value_x,value_y,value_z,simbolo1)
