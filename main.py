@@ -673,17 +673,17 @@ class MainWindow(QWidget):
         
         #L Validación de campos lambda
         try:
-            nx_lambda = int(entry_nx_lambda.text()) if entry_nx_lambda and entry_nx_lambda.text() else 0
+            nx_lambda = int(entry_nx_lambda.text()) if entry_nx_lambda and entry_nx_lambda.text() else None
         except:
             QMessageBox.information(None, "nx_lambda", "Incorrect nx_lambda Format")
             return
         try:
-            ny_lambda = int(entry_ny_lambda.text()) if entry_ny_lambda and entry_ny_lambda.text() else 0
+            ny_lambda = int(entry_ny_lambda.text()) if entry_ny_lambda and entry_ny_lambda.text() else None
         except:
             QMessageBox.information(None, "ny_lambda", "Incorrect ny_lambda Format")
             return
         try:
-            nz_lambda = int(entry_nz_lambda.text()) if entry_nz_lambda and entry_nz_lambda.text() else 0
+            nz_lambda = int(entry_nz_lambda.text()) if entry_nz_lambda and entry_nz_lambda.text() else None
         except:
             QMessageBox.information(None, "nz_lambda", "Incorrect nz_lambda Format")
             return

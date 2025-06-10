@@ -368,7 +368,7 @@ def numerosiniciales(H,H2,nombre_variables,valor_x,valor_y,valor_z,simbolo): ##I
     n_permutaciones = calcular_con_operadores(permutaciones,valor_x,valor_y,valor_z,simbolo)
     return n_permutaciones
 
-def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo, nx_lambda=0, ny_lambda=0, nz_lambda=0):
+def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo, nx_lambda=None, ny_lambda=None, nz_lambda=None):
     Lx, Ly, Lz = obtener_dimensiones_caja(archivo1)
     with open(archivo1, "r") as archivo:
         cont_valores = 0
@@ -403,15 +403,20 @@ def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo, nx_lambd
             #L Iterar sobre cada átomo
             for i in range(val_atom):
                 coordenadas = valor_x1[i]  # [x, y, z]
-                # Calcula lambda para este átomo
-                lambda_val = lambda_xyz(
-                    coordenadas[0], coordenadas[1], coordenadas[2],
-                    nx_lambda, ny_lambda, nz_lambda, Lx, Ly, Lz
-                )
-                # Puedes usar lambda_val como factor de mezcla o umbral
-                # Ejemplo: modificar ponderación o F_prima
-                ponderacion = (lambda_val + 3) / 6  # Normaliza a [0,1]
-                F_prima = ponderacion * value1[i] + (1 - ponderacion) * value2[i]
+                #L Verifica si se debe aplicar lambda
+                if nx_lambda is None and ny_lambda is None and nz_lambda is None:
+                    #L No aplicar transición lambda, usa el método original
+                    valor = lambda x: (x / valor_xminmax) + 1/2
+                    ponderacion = valor(coordenadas[0])
+                    F_prima = ponderacion * value1[i] + (1 - ponderacion) * value2[i]
+                else:
+                    lambda_val, count = lambda_xyz(
+                        coordenadas[0], coordenadas[1], coordenadas[2],
+                        nx_lambda, ny_lambda, nz_lambda, Lx, Ly, Lz
+                    )
+                    #L Normaliza según la cantidad de ejes usados
+                    ponderacion = (lambda_val + count) / (2 * count) if count > 0 else 0.5
+                    F_prima = ponderacion * value1[i] + (1 - ponderacion) * value2[i]
 
                 # Evaluar si F_prima cumple la condición para incrementar según el tipo
                 cumple_condicion = False
@@ -509,11 +514,18 @@ def obtener_dimensiones_caja(archivo1):
 
 #L Funcion lambda
 def lambda_xyz(x, y, z, nx, ny, nz, Lx, Ly, Lz):
-    return (
-        np.sin(2 * np.pi * nx * x / Lx) +
-        np.sin(2 * np.pi * ny * y / Ly) +
-        np.sin(2 * np.pi * nz * z / Lz)
-    )
+    val = 0
+    count = 0
+    if nx is not None:
+        val += np.sin(2 * np.pi * nx * x / Lx)
+        count += 1
+    if ny is not None:
+        val += np.sin(2 * np.pi * ny * y / Ly)
+        count += 1
+    if nz is not None:
+        val += np.sin(2 * np.pi * nz * z / Lz)
+        count += 1
+    return val, count
 
  
 def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacionesE1, valor_permutacionesE2, nombre_resultante,nombre_resultante2, nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2,
