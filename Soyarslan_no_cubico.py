@@ -20,6 +20,8 @@ def Formula_mayores(qi,archivo1,epsilon1,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0)
     ID = 0
     n = len(qi)
     Lx = Ly = Lz = 1 #L Se inicializan las longitudes de x, y, z
+    aceptados = 0
+    rechazados = 0
     for linea in archivo:
         lineac += 1
         valor = 0
@@ -47,8 +49,6 @@ def Formula_mayores(qi,archivo1,epsilon1,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0)
             y_atom = float(r[3])
             z_atom = float(r[4])
 
-            print(f"epsilon={epsilon1}, ax={ax}, nx={nx}, ay={ay}, ny={ny}, az={az}, nz={nz}, Lx={Lx}, Ly={Ly}, Lz={Lz}, x_atom={x_atom}, y_atom={y_atom}, z_atom={z_atom}")
-
             epsilon_var = (
                 epsilon1
                 + (ax if ax else 0) * sin(((nx if nx else 0) * pi * x_atom) / Lx)
@@ -61,6 +61,9 @@ def Formula_mayores(qi,archivo1,epsilon1,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0)
                 ID += 1
                 texto = f"{ID} {r[1]} {r[2]} {r[3]} {r[4]}"
                 datos.append(texto)
+                aceptados += 1
+            else:
+                rechazados += 1
             #elif valor < epsilon1:
             valor_mayores1.append(valor)
     datos[3] = str(ID) + "\n"
@@ -71,6 +74,7 @@ def Formula_mayores(qi,archivo1,epsilon1,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0)
             nuevo.write(datos[i].rstrip())
             if i != len(datos) - 1:
                 nuevo.write("\n")
+    print(f"[Formula_mayores] RESUMEN: Atomos aceptados = {aceptados}, Atomos rechazados = {rechazados}")
 
     archivo.close()
     nuevo.close()
@@ -88,6 +92,8 @@ def Formula_mayores2(qi,archivo1,epsilon2,fi, ax2=0, nx2=0, ay2=0, ny2=0, az2=0,
     ID = 0
     n = len(qi)
     Lx = Ly = Lz = 1 #L Se inicializan las longitudes de x, y, z
+    aceptados = 0
+    rechazados = 0
     for linea in archivo:
         lineac += 1
         valor = 0
@@ -115,8 +121,6 @@ def Formula_mayores2(qi,archivo1,epsilon2,fi, ax2=0, nx2=0, ay2=0, ny2=0, az2=0,
             y_atom = float(r[3])
             z_atom = float(r[4])
 
-            print(f"epsilon={epsilon2}, ax2={ax2}, nx2={nx2}, ay2={ay2}, ny2={ny2}, az2={az2}, nz2={nz2}, Lx={Lx}, Ly={Ly}, Lz={Lz}, x_atom={x_atom}, y_atom={y_atom}, z_atom={z_atom}")
-
             epsilon_var = (
                 epsilon2
                 + (ax2 if ax2 else 0) * sin(((nx2 if nx2 else 0) * pi * x_atom) / Lx)
@@ -129,6 +133,9 @@ def Formula_mayores2(qi,archivo1,epsilon2,fi, ax2=0, nx2=0, ay2=0, ny2=0, az2=0,
                 ID += 1
                 texto = f"{ID} {r[1]} {r[2]} {r[3]} {r[4]}"
                 datos.append(texto)
+                aceptados += 1
+            else:
+                rechazados += 1
             #elif valor < epsilon1:
             valor_mayores2.append(valor)
     datos[3] = str(ID) + "\n"
@@ -138,7 +145,8 @@ def Formula_mayores2(qi,archivo1,epsilon2,fi, ax2=0, nx2=0, ay2=0, ny2=0, az2=0,
         else:
             nuevo.write(datos[i].rstrip())
             if i != len(datos) - 1:
-                nuevo.write("\n")    
+                nuevo.write("\n")
+    print(f"[Formula_mayores2] RESUMEN: Atomos aceptados = {aceptados}, Atomos rechazados = {rechazados}")
     archivo.close()
     nuevo.close()
     return valor_mayores2
@@ -155,6 +163,8 @@ def Formula_menores(qi,archivo1,epsilon1,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0)
     ID = 0
     n = len(qi)
     Lx = Ly = Lz = 1 #L Se inicializan las longitudes de x, y, z
+    aceptados = 0
+    rechazados = 0
     for linea in archivo:
         lineac += 1
         valor = 0
@@ -182,8 +192,6 @@ def Formula_menores(qi,archivo1,epsilon1,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0)
             y_atom = float(r[3])
             z_atom = float(r[4])
 
-            print(f"epsilon={epsilon1}, ax={ax}, nx={nx}, ay={ay}, ny={ny}, az={az}, nz={nz}, Lx={Lx}, Ly={Ly}, Lz={Lz}, x_atom={x_atom}, y_atom={y_atom}, z_atom={z_atom}")
-
             epsilon_var = (
                 epsilon1
                 + (ax if ax else 0) * sin(((nx if nx else 0) * pi * x_atom) / Lx)
@@ -196,6 +204,9 @@ def Formula_menores(qi,archivo1,epsilon1,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0)
                 ID += 1
                 texto = f"{ID} {r[1]} {r[2]} {r[3]} {r[4]}"
                 datos.append(texto)
+                aceptados += 1
+            else:
+                rechazados += 1
             valor_menores1.append(valor)
     datos[3] = str(ID) + "\n"
     for i in range(0, len(datos)):
@@ -205,6 +216,7 @@ def Formula_menores(qi,archivo1,epsilon1,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0)
             nuevo.write(datos[i].rstrip())
             if i != len(datos) - 1:
                 nuevo.write("\n")
+    print(f"[Formula_menores] RESUMEN: Atomos aceptados = {aceptados}, Atomos rechazados = {rechazados}")
 
     archivo.close()
     nuevo.close()
@@ -221,6 +233,8 @@ def Formula_menores2(qi,archivo1,epsilon2,fi, ax2=0, nx2=0, ay2=0, ny2=0, az2=0,
     ID = 0
     n = len(qi)
     Lx = Ly = Lz = 1 #L Se inicializan las longitudes de x, y, z
+    aceptados = 0
+    rechazados = 0
     for linea in archivo:
         lineac += 1
         valor = 0
@@ -248,8 +262,6 @@ def Formula_menores2(qi,archivo1,epsilon2,fi, ax2=0, nx2=0, ay2=0, ny2=0, az2=0,
             y_atom = float(r[3])
             z_atom = float(r[4])
 
-            print(f"epsilon={epsilon2}, ax2={ax2}, nx2={nx2}, ay2={ay2}, ny2={ny2}, az2={az2}, nz2={nz2}, Lx={Lx}, Ly={Ly}, Lz={Lz}, x_atom={x_atom}, y_atom={y_atom}, z_atom={z_atom}")
-
             epsilon_var = (
                 epsilon2
                 + (ax2 if ax2 else 0) * sin(((nx2 if nx2 else 0) * pi * x_atom) / Lx)
@@ -262,6 +274,9 @@ def Formula_menores2(qi,archivo1,epsilon2,fi, ax2=0, nx2=0, ay2=0, ny2=0, az2=0,
                 ID += 1
                 texto = f"{ID} {r[1]} {r[2]} {r[3]} {r[4]}"
                 datos.append(texto)
+                aceptados += 1
+            else:
+                rechazados += 1
             valor_menores2.append(valor)
     datos[3] = str(ID) + "\n"
     for i in range(0, len(datos)):
@@ -271,6 +286,7 @@ def Formula_menores2(qi,archivo1,epsilon2,fi, ax2=0, nx2=0, ay2=0, ny2=0, az2=0,
             nuevo.write(datos[i].rstrip())
             if i != len(datos) - 1:
                 nuevo.write("\n")
+    print(f"[Formula_menores2] RESUMEN: Atomos aceptados = {aceptados}, Atomos rechazados = {rechazados}")
 
     archivo.close()
     nuevo.close()
