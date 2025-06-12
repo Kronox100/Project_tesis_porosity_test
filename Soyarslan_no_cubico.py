@@ -384,7 +384,8 @@ def numerosiniciales(H,H2,nombre_variables,valor_x,valor_y,valor_z,simbolo): ##I
     n_permutaciones = calcular_con_operadores(permutaciones,valor_x,valor_y,valor_z,simbolo)
     return n_permutaciones
 
-def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo, nx_lambda=None, ny_lambda=None, nz_lambda=None):
+def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo, ax=0, nx=0, ay=0, ny=0, az=0, nz=0,
+    ax2=0, nx2=0, ay2=0, ny2=0, az2=0, nz2=0, nx_lambda=None, ny_lambda=None, nz_lambda=None):
     Lx, Ly, Lz = obtener_dimensiones_caja(archivo1)
     with open(archivo1, "r") as archivo:
         cont_valores = 0
@@ -419,12 +420,29 @@ def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo, nx_lambd
             #L Iterar sobre cada átomo
             for i in range(val_atom):
                 coordenadas = valor_x1[i]  # [x, y, z]
+                x_atom, y_atom, z_atom = coordenadas
+
+                #L Calcular epsilon_var1 y epsilon_var2 usando porosidad variable
+                epsilon_var1 = (
+                    epsilon1
+                    + (ax if ax else 0) * sin(((nx if nx else 0) * pi * x_atom) / Lx)
+                    + (ay if ay else 0) * sin(((ny if ny else 0) * pi * y_atom) / Ly)
+                    + (az if az else 0) * sin(((nz if nz else 0) * pi * z_atom) / Lz)
+                )
+                epsilon_var2 = (
+                    epsilon2
+                    + (ax2 if ax2 else 0) * sin(((nx2 if nx2 else 0) * pi * x_atom) / Lx)
+                    + (ay2 if ay2 else 0) * sin(((ny2 if ny2 else 0) * pi * y_atom) / Ly)
+                    + (az2 if az2 else 0) * sin(((nz2 if nz2 else 0) * pi * z_atom) / Lz)
+                )
+
                 #L Verifica si se debe aplicar lambda
+                #L No aplicar transición lambda, usa el método original
                 if nx_lambda is None and ny_lambda is None and nz_lambda is None:
-                    #L No aplicar transición lambda, usa el método original
                     valor = lambda x: (x / valor_xminmax) + 1/2
                     ponderacion = valor(coordenadas[0])
                     F_prima = ponderacion * value1[i] + (1 - ponderacion) * value2[i]
+                #L Aplicar transición lambda
                 else:
                     lambda_val, count = lambda_xyz(
                         coordenadas[0], coordenadas[1], coordenadas[2],
@@ -437,16 +455,16 @@ def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo, nx_lambd
                 # Evaluar si F_prima cumple la condición para incrementar según el tipo
                 cumple_condicion = False
                 if tipo == 1:  # F1 = < y F2 = <
-                    if F_prima > epsilon1 and F_prima > epsilon2:
+                    if F_prima > epsilon_var1 and F_prima > epsilon_var2:
                         cumple_condicion = True
                 elif tipo == 2:  # F1 = > y F2 = <
-                    if F_prima < epsilon1 and F_prima > epsilon2:
+                    if F_prima < epsilon_var1 and F_prima > epsilon_var2:
                         cumple_condicion = True
                 elif tipo == 3:  # F1 = < y F2 = >
-                    if F_prima > epsilon1 and F_prima < epsilon2:
+                    if F_prima > epsilon_var1 and F_prima < epsilon_var2:
                         cumple_condicion = True
                 elif tipo == 4:  # F1 = > y F2 = >
-                    if F_prima < epsilon1 and F_prima < epsilon2:
+                    if F_prima < epsilon_var1 and F_prima < epsilon_var2:
                         cumple_condicion = True
 
                 if cumple_condicion:
@@ -568,7 +586,8 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
                     type=1
                     mayor1=Formula_mayores(permutaciones,archivo1,epsilon1,fi, ax, nx, ay, ny, az, nz)
                     mayor2=Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1, ax2, nx2, ay2, ny2, az2, nz2)
-                    hybrid_function(archivo1, mayor1,mayor2, epsilon1, epsilon2,type)
+                    hybrid_function(archivo1, mayor1, mayor2, epsilon1, epsilon2, type, ax, nx, ay, ny, 
+                                    az, nz, ax2, nx2, ay2, ny2, az2, nz2, nx_lambda, ny_lambda, nz_lambda)
                     #F_prima = lambda_ * mayor1 + (1 - lambda_) * mayor2
 
                 except:
@@ -583,8 +602,8 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
                     print("F1 = > ---- F2 = <")
                     type=2
                     menor1 = Formula_menores(permutaciones,archivo1,epsilon1,fi, ax, nx, ay, ny, az, nz)
-                    mayor2= Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1, ax2, nx2, ay2, ny2, az2, nz2)
-                    hybrid_function(archivo1, menor1,mayor2, epsilon1, epsilon2,type)
+                    mayor2 = Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1, ax2, nx2, ay2, ny2, az2, nz2)
+                    hybrid_function(archivo1, menor1, mayor2, epsilon1, epsilon2, type, ax, nx, ay, ny, az, nz, ax2, nx2, ay2, ny2, az2, nz2, nx_lambda, ny_lambda, nz_lambda)
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
                 aleacion("file1.dump",nombre_resultante,nombre_variables)
@@ -597,7 +616,8 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
                     type=3
                     mayor1=Formula_mayores(permutaciones,archivo1,epsilon1,fi)
                     menor2=Formula_menores2(permutaciones2,archivo1,epsilon2,fi1)
-                    hybrid_function(archivo1, mayor1,menor2, epsilon1, epsilon2,type)
+                    hybrid_function(archivo1, mayor1, menor2, epsilon1, epsilon2, type, ax, nx, ay, ny, 
+                                    az, nz, ax2, nx2, ay2, ny2, az2, nz2, nx_lambda, ny_lambda, nz_lambda)
 
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
@@ -611,7 +631,8 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
                     type=4
                     menor1=Formula_menores(permutaciones,archivo1,epsilon1,fi)
                     menor2=Formula_menores2(permutaciones2,archivo1,epsilon2,fi1)
-                    hybrid_function(archivo1, menor1,menor2, epsilon1, epsilon2,type) #L CORRECCION?? "mayor1" deberia ser "menor1"???
+                    hybrid_function(archivo1, menor1, menor2, epsilon1, epsilon2, type, ax, nx, ay, ny, 
+                                    az, nz, ax2, nx2, ay2, ny2, az2, nz2, nx_lambda, ny_lambda, nz_lambda) #L CORRECCION?? "mayor1" deberia ser "menor1"???
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
                 aleacion("file1.dump",nombre_resultante,nombre_variables)
