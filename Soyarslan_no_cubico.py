@@ -81,7 +81,7 @@ def Formula_mayores(qi,archivo1,epsilon1,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0)
     #print(len(valor2),'valor2')
     return valor_mayores1
 
-def Formula_mayores2(qi,archivo1,epsilon2,fi, ax2=0, nx2=0, ay2=0, ny2=0, az2=0, nz2=0): #L CORRECCION epsilon1 se cambia por epsilon2
+def Formula_mayores2(qi,archivo1,epsilon2,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0): #L CORRECCION epsilon1 se cambia por epsilon2
     archivo = open(archivo1, "r")
     nuevo = open("process_files/file2.dump", "w")
     x =y=z = 0
@@ -123,9 +123,9 @@ def Formula_mayores2(qi,archivo1,epsilon2,fi, ax2=0, nx2=0, ay2=0, ny2=0, az2=0,
 
             epsilon_var = (
                 epsilon2
-                + (ax2 if ax2 else 0) * sin(((nx2 if nx2 else 0) * pi * x_atom) / Lx)
-                + (ay2 if ay2 else 0) * sin(((ny2 if ny2 else 0) * pi * y_atom) / Ly)
-                + (az2 if az2 else 0) * sin(((nz2 if nz2 else 0) * pi * z_atom) / Lz)
+                + (ax if ax else 0) * sin(((nx if nx else 0) * pi * x_atom) / Lx)
+                + (ay if ay else 0) * sin(((ny if ny else 0) * pi * y_atom) / Ly)
+                + (az if az else 0) * sin(((nz if nz else 0) * pi * z_atom) / Lz)
             )
 
             #L Se cambia epsilon1 por epsilon_var
@@ -222,7 +222,7 @@ def Formula_menores(qi,archivo1,epsilon1,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0)
     nuevo.close()
     return valor_menores1
 
-def Formula_menores2(qi,archivo1,epsilon2,fi, ax2=0, nx2=0, ay2=0, ny2=0, az2=0, nz2=0): #L CORRECCION epsilon1 se cambia por epsilon2
+def Formula_menores2(qi,archivo1,epsilon2,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0): #L CORRECCION epsilon1 se cambia por epsilon2
     archivo = open(archivo1, "r")
     nuevo = open("process_files/file2.dump", "w")
     x =y=z = 0
@@ -264,9 +264,9 @@ def Formula_menores2(qi,archivo1,epsilon2,fi, ax2=0, nx2=0, ay2=0, ny2=0, az2=0,
 
             epsilon_var = (
                 epsilon2
-                + (ax2 if ax2 else 0) * sin(((nx2 if nx2 else 0) * pi * x_atom) / Lx)
-                + (ay2 if ay2 else 0) * sin(((ny2 if ny2 else 0) * pi * y_atom) / Ly)
-                + (az2 if az2 else 0) * sin(((nz2 if nz2 else 0) * pi * z_atom) / Lz)
+                + (ax if ax else 0) * sin(((nx if nx else 0) * pi * x_atom) / Lx)
+                + (ay if ay else 0) * sin(((ny if ny else 0) * pi * y_atom) / Ly)
+                + (az if az else 0) * sin(((nz if nz else 0) * pi * z_atom) / Lz)
             )
 
             #L Se cambia epsilon1 por epsilon_var
@@ -385,7 +385,7 @@ def numerosiniciales(H,H2,nombre_variables,valor_x,valor_y,valor_z,simbolo): ##I
     return n_permutaciones
 
 def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo, ax=0, nx=0, ay=0, ny=0, az=0, nz=0,
-    ax2=0, nx2=0, ay2=0, ny2=0, az2=0, nz2=0, nx_lambda=None, ny_lambda=None, nz_lambda=None):
+    nx_lambda=None, ny_lambda=None, nz_lambda=None):
     Lx, Ly, Lz = obtener_dimensiones_caja(archivo1)
     with open(archivo1, "r") as archivo:
         cont_valores = 0
@@ -431,9 +431,9 @@ def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo, ax=0, nx
                 )
                 epsilon_var2 = (
                     epsilon2
-                    + (ax2 if ax2 else 0) * sin(((nx2 if nx2 else 0) * pi * x_atom) / Lx)
-                    + (ay2 if ay2 else 0) * sin(((ny2 if ny2 else 0) * pi * y_atom) / Ly)
-                    + (az2 if az2 else 0) * sin(((nz2 if nz2 else 0) * pi * z_atom) / Lz)
+                    + (ax if ax else 0) * sin(((nx if nx else 0) * pi * x_atom) / Lx)
+                    + (ay if ay else 0) * sin(((ny if ny else 0) * pi * y_atom) / Ly)
+                    + (az if az else 0) * sin(((nz if nz else 0) * pi * z_atom) / Lz)
                 )
 
                 #L Verifica si se debe aplicar lambda
@@ -563,7 +563,7 @@ def lambda_xyz(x, y, z, nx, ny, nz, Lx, Ly, Lz):
 
  
 def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacionesE1, valor_permutacionesE2, nombre_resultante,nombre_resultante2, nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2,
-                ax=None, nx=None, ay=None, ny=None, az=None, nz=None,ax2=None, nx2=None, ay2=None, ny2=None, az2=None, nz2=None, nx_lambda=0, ny_lambda=0, nz_lambda=0):
+                ax=None, nx=None, ay=None, ny=None, az=None, nz=None, nx_lambda=0, ny_lambda=0, nz_lambda=0):
     if not os.path.exists("process_files"):
             os.makedirs("process_files")
     permutaciones = numerosiniciales(sqrt(valor_permutacionesE1),valor_permutacionesE1, nombre_variables,value_x,value_y,value_z,simbolo1)
@@ -585,9 +585,9 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
                     print("F1 = < ---- F2 = <")
                     type=1
                     mayor1=Formula_mayores(permutaciones,archivo1,epsilon1,fi, ax, nx, ay, ny, az, nz)
-                    mayor2=Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1, ax2, nx2, ay2, ny2, az2, nz2)
+                    mayor2=Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1, ax, nx, ay, ny, az, nz)
                     hybrid_function(archivo1, mayor1, mayor2, epsilon1, epsilon2, type, ax, nx, ay, ny, 
-                                    az, nz, ax2, nx2, ay2, ny2, az2, nz2, nx_lambda, ny_lambda, nz_lambda)
+                                    az, nz, nx_lambda, ny_lambda, nz_lambda)
                     #F_prima = lambda_ * mayor1 + (1 - lambda_) * mayor2
 
                 except:
@@ -602,8 +602,8 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
                     print("F1 = > ---- F2 = <")
                     type=2
                     menor1 = Formula_menores(permutaciones,archivo1,epsilon1,fi, ax, nx, ay, ny, az, nz)
-                    mayor2 = Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1, ax2, nx2, ay2, ny2, az2, nz2)
-                    hybrid_function(archivo1, menor1, mayor2, epsilon1, epsilon2, type, ax, nx, ay, ny, az, nz, ax2, nx2, ay2, ny2, az2, nz2, nx_lambda, ny_lambda, nz_lambda)
+                    mayor2 = Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1, ax, nx, ay, ny, az, nz)
+                    hybrid_function(archivo1, menor1, mayor2, epsilon1, epsilon2, type, ax, nx, ay, ny, az, nz, nx_lambda, ny_lambda, nz_lambda)
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
                 aleacion("file1.dump",nombre_resultante,nombre_variables)
@@ -617,7 +617,7 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
                     mayor1=Formula_mayores(permutaciones,archivo1,epsilon1,fi)
                     menor2=Formula_menores2(permutaciones2,archivo1,epsilon2,fi1)
                     hybrid_function(archivo1, mayor1, menor2, epsilon1, epsilon2, type, ax, nx, ay, ny, 
-                                    az, nz, ax2, nx2, ay2, ny2, az2, nz2, nx_lambda, ny_lambda, nz_lambda)
+                                    az, nz, nx_lambda, ny_lambda, nz_lambda)
 
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
@@ -632,7 +632,7 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
                     menor1=Formula_menores(permutaciones,archivo1,epsilon1,fi)
                     menor2=Formula_menores2(permutaciones2,archivo1,epsilon2,fi1)
                     hybrid_function(archivo1, menor1, menor2, epsilon1, epsilon2, type, ax, nx, ay, ny, 
-                                    az, nz, ax2, nx2, ay2, ny2, az2, nz2, nx_lambda, ny_lambda, nz_lambda) #L CORRECCION?? "mayor1" deberia ser "menor1"???
+                                    az, nz, nx_lambda, ny_lambda, nz_lambda) #L CORRECCION?? "mayor1" deberia ser "menor1"???
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
                 aleacion("file1.dump",nombre_resultante,nombre_variables)
