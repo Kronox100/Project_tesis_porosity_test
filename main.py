@@ -659,8 +659,12 @@ class MainWindow(QWidget):
         #L Imprimir los valores capturados:
         print("Valores senoidales:", ax, nx, ay, ny, az, nz)
 
-        QMessageBox.information(None, "Senoidales capturados",
-            f"E: {ax}, {nx}, {ay}, {ny}, {az}, {nz}")
+        QMessageBox.information(
+            None,
+            "Senoidales y Lambda capturados",
+            f"E: {ax}, {nx}, {ay}, {ny}, {az}, {nz}\n"
+            f"Lambda: {nx_lambda}, {ny_lambda}, {nz_lambda}"
+        )
 
         simbolo1 = str(boton_simbolo_var.text())
         simbolo2 = str(btn_Simbolo2_var.text())
