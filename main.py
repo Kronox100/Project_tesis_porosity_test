@@ -364,7 +364,7 @@ class MainWindow(QWidget):
         
         # nx
         nx_lambda_layout = QHBoxLayout()
-        label_nx_lambda = ajustar_margenes(QLabel("nx:"), 40)
+        label_nx_lambda = ajustar_margenes(QLabel("nx:"), 50)
         entry_nx_lambda = QLineEdit()
         entry_nx_lambda.setStyleSheet(borde_entry)
         entry_nx_lambda.setFixedSize(70, 36)
@@ -374,7 +374,7 @@ class MainWindow(QWidget):
         
         # ny
         ny_lambda_layout = QHBoxLayout()
-        label_ny_lambda = ajustar_margenes(QLabel("ny:"), 40)
+        label_ny_lambda = ajustar_margenes(QLabel("ny:"), 50)
         entry_ny_lambda = QLineEdit()
         entry_ny_lambda.setStyleSheet(borde_entry)
         entry_ny_lambda.setFixedSize(70, 36)
@@ -384,7 +384,7 @@ class MainWindow(QWidget):
         
         # nz
         nz_lambda_layout = QHBoxLayout()
-        label_nz_lambda = ajustar_margenes(QLabel("nz:"), 40)
+        label_nz_lambda = ajustar_margenes(QLabel("nz:"), 50)
         entry_nz_lambda = QLineEdit()
         entry_nz_lambda.setStyleSheet(borde_entry)
         entry_nz_lambda.setFixedSize(70, 36)
