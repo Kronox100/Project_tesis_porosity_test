@@ -93,6 +93,7 @@ project/.
 AUTHORS
 - **Luis Andaur** Luis.andaur@alu.ucm.cl
 - **Felipe Morales** Felipe.morales.03@alu.ucm.cl
+- **Luis Olave** luis.olave@alu.ucm.cl
 
 SUPPORT
 For questions or problems, contact the authors of the project or check the comments inside the code.

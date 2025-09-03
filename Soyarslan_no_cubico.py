@@ -9,7 +9,7 @@ from skimage import measure
     
     
     
-def Formula_mayores(qi,archivo1,epsilon1,fi):
+def Formula_mayores(qi,archivo1,epsilon1,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0):
     archivo = open(archivo1, "r")
     nuevo = open("process_files/file1.dump", "w")
     x =y=z = 0
@@ -19,6 +19,9 @@ def Formula_mayores(qi,archivo1,epsilon1,fi):
     nocubico = []
     ID = 0
     n = len(qi)
+    Lx = Ly = Lz = 1 #L Se inicializan las longitudes de x, y, z
+    aceptados = 0
+    rechazados = 0
     for linea in archivo:
         lineac += 1
         valor = 0
@@ -27,20 +30,40 @@ def Formula_mayores(qi,archivo1,epsilon1,fi):
             datos.append(linea)
             if lineac == 6:
                 x = float(r[1].rstrip()) - float(r[0])
+                Lx= x #L Se define longitud de x
             elif lineac == 7:
                 y = float(r[1].rstrip()) - float(r[0])
+                Ly = y #L Se define longitud de y
             elif lineac == 8:
                 z = float(r[1].rstrip()) - float(r[0])
+                Lz = z #L Se define longitud de z
                 nocubico = nocubicos(x,y,z,90,90,90)
         elif lineac > 9:
             for j in range(n):
                 valor += cos((qi[j][0]*((2*pi)/nocubico[0])*float(r[2]) + (qi[j][1]*((2*pi)/nocubico[1])*float(r[3]) + (qi[j][2]*((2*pi)/nocubico[2])*float(r[4]) + fi[j]))))#fi
             norm = sqrt(2/n)
             valor = valor * norm
-            if epsilon1 < valor:
+
+            #L Porosidad variable
+            x_atom = float(r[2])
+            y_atom = float(r[3])
+            z_atom = float(r[4])
+
+            epsilon_var = (
+                epsilon1
+                + (ax if ax else 0) * sin(((nx if nx else 0) * pi * x_atom) / Lx)
+                + (ay if ay else 0) * sin(((ny if ny else 0) * pi * y_atom) / Ly)
+                + (az if az else 0) * sin(((nz if nz else 0) * pi * z_atom) / Lz)
+            )
+
+            #L Se cambia epsilon1 por epsilon_var
+            if epsilon_var < valor:
                 ID += 1
                 texto = f"{ID} {r[1]} {r[2]} {r[3]} {r[4]}"
                 datos.append(texto)
+                aceptados += 1
+            else:
+                rechazados += 1
             #elif valor < epsilon1:
             valor_mayores1.append(valor)
     datos[3] = str(ID) + "\n"
@@ -51,13 +74,14 @@ def Formula_mayores(qi,archivo1,epsilon1,fi):
             nuevo.write(datos[i].rstrip())
             if i != len(datos) - 1:
                 nuevo.write("\n")
+    print(f"[Formula_mayores] RESUMEN: Atomos aceptados = {aceptados}, Atomos rechazados = {rechazados}")
 
     archivo.close()
     nuevo.close()
     #print(len(valor2),'valor2')
     return valor_mayores1
 
-def Formula_mayores2(qi,archivo1,epsilon1,fi):
+def Formula_mayores2(qi,archivo1,epsilon2,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0): #L CORRECCION epsilon1 se cambia por epsilon2
     archivo = open(archivo1, "r")
     nuevo = open("process_files/file2.dump", "w")
     x =y=z = 0
@@ -67,6 +91,9 @@ def Formula_mayores2(qi,archivo1,epsilon1,fi):
     nocubico = []
     ID = 0
     n = len(qi)
+    Lx = Ly = Lz = 1 #L Se inicializan las longitudes de x, y, z
+    aceptados = 0
+    rechazados = 0
     for linea in archivo:
         lineac += 1
         valor = 0
@@ -75,20 +102,40 @@ def Formula_mayores2(qi,archivo1,epsilon1,fi):
             datos.append(linea)
             if lineac == 6:
                 x = float(r[1].rstrip()) - float(r[0])
+                Lx= x #L Se define longitud de x
             elif lineac == 7:
                 y = float(r[1].rstrip()) - float(r[0])
+                Ly= y #L Se define longitud de y
             elif lineac == 8:
                 z = float(r[1].rstrip()) - float(r[0])
                 nocubico = nocubicos(x,y,z,90,90,90)
+                Lz= z #L Se define longitud de z
         elif lineac > 9:
             for j in range(n):
                 valor += cos((qi[j][0]*((2*pi)/nocubico[0])*float(r[2]) + (qi[j][1]*((2*pi)/nocubico[1])*float(r[3]) + (qi[j][2]*((2*pi)/nocubico[2])*float(r[4]) + fi[j]))))#fi
             norm = sqrt(2/n)
             valor = valor * norm
-            if epsilon1 < valor:
+
+            #L Porosidad variable
+            x_atom = float(r[2])
+            y_atom = float(r[3])
+            z_atom = float(r[4])
+
+            epsilon_var = (
+                epsilon2
+                + (ax if ax else 0) * sin(((nx if nx else 0) * pi * x_atom) / Lx)
+                + (ay if ay else 0) * sin(((ny if ny else 0) * pi * y_atom) / Ly)
+                + (az if az else 0) * sin(((nz if nz else 0) * pi * z_atom) / Lz)
+            )
+
+            #L Se cambia epsilon1 por epsilon_var
+            if epsilon_var < valor:
                 ID += 1
                 texto = f"{ID} {r[1]} {r[2]} {r[3]} {r[4]}"
                 datos.append(texto)
+                aceptados += 1
+            else:
+                rechazados += 1
             #elif valor < epsilon1:
             valor_mayores2.append(valor)
     datos[3] = str(ID) + "\n"
@@ -98,13 +145,14 @@ def Formula_mayores2(qi,archivo1,epsilon1,fi):
         else:
             nuevo.write(datos[i].rstrip())
             if i != len(datos) - 1:
-                nuevo.write("\n")    
+                nuevo.write("\n")
+    print(f"[Formula_mayores2] RESUMEN: Atomos aceptados = {aceptados}, Atomos rechazados = {rechazados}")
     archivo.close()
     nuevo.close()
     return valor_mayores2
 
 
-def Formula_menores(qi,archivo1,epsilon1,fi):
+def Formula_menores(qi,archivo1,epsilon1,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0):
     archivo = open(archivo1, "r")
     nuevo = open("process_files/file1.dump", "w")
     x =y=z = 0
@@ -114,6 +162,9 @@ def Formula_menores(qi,archivo1,epsilon1,fi):
     nocubico = []
     ID = 0
     n = len(qi)
+    Lx = Ly = Lz = 1 #L Se inicializan las longitudes de x, y, z
+    aceptados = 0
+    rechazados = 0
     for linea in archivo:
         lineac += 1
         valor = 0
@@ -122,20 +173,40 @@ def Formula_menores(qi,archivo1,epsilon1,fi):
             datos.append(linea)
             if lineac == 6:
                 x = float(r[1].rstrip()) - float(r[0])
+                Lx= x #L Se define longitud de x
             elif lineac == 7:
                 y = float(r[1].rstrip()) - float(r[0])
+                Ly= y #L Se define longitud de y
             elif lineac == 8:
                 z = float(r[1].rstrip()) - float(r[0])
+                Lz= z #L Se define longitud de z
                 nocubico = nocubicos(x,y,z,90,90,90)
         elif lineac > 9:
             for j in range(n):
                 valor += cos((qi[j][0]*((2*pi)/nocubico[0])*float(r[2]) + (qi[j][1]*((2*pi)/nocubico[1])*float(r[3]) + (qi[j][2]*((2*pi)/nocubico[2])*float(r[4]) + fi[j]))))#fi
             norm = sqrt(2/n)
             valor = valor * norm
-            if epsilon1 > valor:
+
+            #L Porosidad variable
+            x_atom = float(r[2])
+            y_atom = float(r[3])
+            z_atom = float(r[4])
+
+            epsilon_var = (
+                epsilon1
+                + (ax if ax else 0) * sin(((nx if nx else 0) * pi * x_atom) / Lx)
+                + (ay if ay else 0) * sin(((ny if ny else 0) * pi * y_atom) / Ly)
+                + (az if az else 0) * sin(((nz if nz else 0) * pi * z_atom) / Lz)
+            )
+
+            #L Se cambia epsilon1 por epsilon_var
+            if epsilon_var > valor:
                 ID += 1
                 texto = f"{ID} {r[1]} {r[2]} {r[3]} {r[4]}"
                 datos.append(texto)
+                aceptados += 1
+            else:
+                rechazados += 1
             valor_menores1.append(valor)
     datos[3] = str(ID) + "\n"
     for i in range(0, len(datos)):
@@ -145,12 +216,13 @@ def Formula_menores(qi,archivo1,epsilon1,fi):
             nuevo.write(datos[i].rstrip())
             if i != len(datos) - 1:
                 nuevo.write("\n")
+    print(f"[Formula_menores] RESUMEN: Atomos aceptados = {aceptados}, Atomos rechazados = {rechazados}")
 
     archivo.close()
     nuevo.close()
     return valor_menores1
 
-def Formula_menores2(qi,archivo1,epsilon1,fi):
+def Formula_menores2(qi,archivo1,epsilon2,fi, ax=0, nx=0, ay=0, ny=0, az=0, nz=0): #L CORRECCION epsilon1 se cambia por epsilon2
     archivo = open(archivo1, "r")
     nuevo = open("process_files/file2.dump", "w")
     x =y=z = 0
@@ -160,6 +232,9 @@ def Formula_menores2(qi,archivo1,epsilon1,fi):
     nocubico = []
     ID = 0
     n = len(qi)
+    Lx = Ly = Lz = 1 #L Se inicializan las longitudes de x, y, z
+    aceptados = 0
+    rechazados = 0
     for linea in archivo:
         lineac += 1
         valor = 0
@@ -168,20 +243,40 @@ def Formula_menores2(qi,archivo1,epsilon1,fi):
             datos.append(linea)
             if lineac == 6:
                 x = float(r[1].rstrip()) - float(r[0])
+                Lx= x #L Se define longitud de x
             elif lineac == 7:
                 y = float(r[1].rstrip()) - float(r[0])
+                Ly= y #L Se define longitud de y
             elif lineac == 8:
                 z = float(r[1].rstrip()) - float(r[0])
+                Lz= z #L Se define longitud de z
                 nocubico = nocubicos(x,y,z,90,90,90)
         elif lineac > 9:
             for j in range(n):
                 valor += cos((qi[j][0]*((2*pi)/nocubico[0])*float(r[2]) + (qi[j][1]*((2*pi)/nocubico[1])*float(r[3]) + (qi[j][2]*((2*pi)/nocubico[2])*float(r[4]) + fi[j]))))#fi
             norm = sqrt(2/n)
             valor = valor * norm
-            if epsilon1 > valor:
+            
+            #L Porosidad variable
+            x_atom = float(r[2])
+            y_atom = float(r[3])
+            z_atom = float(r[4])
+
+            epsilon_var = (
+                epsilon2
+                + (ax if ax else 0) * sin(((nx if nx else 0) * pi * x_atom) / Lx)
+                + (ay if ay else 0) * sin(((ny if ny else 0) * pi * y_atom) / Ly)
+                + (az if az else 0) * sin(((nz if nz else 0) * pi * z_atom) / Lz)
+            )
+
+            #L Se cambia epsilon1 por epsilon_var
+            if epsilon_var > valor:
                 ID += 1
                 texto = f"{ID} {r[1]} {r[2]} {r[3]} {r[4]}"
                 datos.append(texto)
+                aceptados += 1
+            else:
+                rechazados += 1
             valor_menores2.append(valor)
     datos[3] = str(ID) + "\n"
     for i in range(0, len(datos)):
@@ -191,6 +286,7 @@ def Formula_menores2(qi,archivo1,epsilon1,fi):
             nuevo.write(datos[i].rstrip())
             if i != len(datos) - 1:
                 nuevo.write("\n")
+    print(f"[Formula_menores2] RESUMEN: Atomos aceptados = {aceptados}, Atomos rechazados = {rechazados}")
 
     archivo.close()
     nuevo.close()
@@ -288,7 +384,9 @@ def numerosiniciales(H,H2,nombre_variables,valor_x,valor_y,valor_z,simbolo): ##I
     n_permutaciones = calcular_con_operadores(permutaciones,valor_x,valor_y,valor_z,simbolo)
     return n_permutaciones
 
-def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo):
+def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo, ax=0, nx=0, ay=0, ny=0, az=0, nz=0,
+    nx_lambda=None, ny_lambda=None, nz_lambda=None):
+    Lx, Ly, Lz = obtener_dimensiones_caja(archivo1)
     with open(archivo1, "r") as archivo:
         cont_valores = 0
         values_maxmin = []
@@ -319,28 +417,54 @@ def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo):
             for dato in datos:
                 archivo_salida.write(dato)
 
-            # Iterar sobre cada átomo
+            #L Iterar sobre cada átomo
             for i in range(val_atom):
-                coordenadas = valor_x1[i]  # Extraer las coordenadas como lista de floats
-                # Calcular F_prima usando value1 y value2
-                #valor = lambda x: (x / valor_xminmax) if valor_xminmax != 0 else 0.5
-                valor = lambda x: (x / valor_xminmax) + 1/2
-                ponderacion = valor(coordenadas[0])
-                F_prima = ponderacion * value1[i] + (1 - ponderacion) * value2[i]
+                coordenadas = valor_x1[i]  # [x, y, z]
+                x_atom, y_atom, z_atom = coordenadas
+
+                #L Calcular epsilon_var1 y epsilon_var2 usando porosidad variable
+                epsilon_var1 = (
+                    epsilon1
+                    + (ax if ax else 0) * sin(((nx if nx else 0) * pi * x_atom) / Lx)
+                    + (ay if ay else 0) * sin(((ny if ny else 0) * pi * y_atom) / Ly)
+                    + (az if az else 0) * sin(((nz if nz else 0) * pi * z_atom) / Lz)
+                )
+                epsilon_var2 = (
+                    epsilon2
+                    + (ax if ax else 0) * sin(((nx if nx else 0) * pi * x_atom) / Lx)
+                    + (ay if ay else 0) * sin(((ny if ny else 0) * pi * y_atom) / Ly)
+                    + (az if az else 0) * sin(((nz if nz else 0) * pi * z_atom) / Lz)
+                )
+
+                #L Verifica si se debe aplicar lambda
+                #L No aplicar transición lambda, usa el método original
+                if nx_lambda is None and ny_lambda is None and nz_lambda is None:
+                    valor = lambda x: (x / valor_xminmax) + 1/2
+                    ponderacion = valor(coordenadas[0])
+                    F_prima = ponderacion * value1[i] + (1 - ponderacion) * value2[i]
+                #L Aplicar transición lambda
+                else:
+                    lambda_val, count = lambda_xyz(
+                        coordenadas[0], coordenadas[1], coordenadas[2],
+                        nx_lambda, ny_lambda, nz_lambda, Lx, Ly, Lz
+                    )
+                    #L Normaliza según la cantidad de ejes usados
+                    ponderacion = (lambda_val + count) / (2 * count) if count > 0 else 0.5
+                    F_prima = ponderacion * value1[i] + (1 - ponderacion) * value2[i]
 
                 # Evaluar si F_prima cumple la condición para incrementar según el tipo
                 cumple_condicion = False
                 if tipo == 1:  # F1 = < y F2 = <
-                    if F_prima > epsilon1 and F_prima > epsilon2:
+                    if F_prima > epsilon_var1 and F_prima > epsilon_var2:
                         cumple_condicion = True
                 elif tipo == 2:  # F1 = > y F2 = <
-                    if F_prima < epsilon1 and F_prima > epsilon2:
+                    if F_prima < epsilon_var1 and F_prima > epsilon_var2:
                         cumple_condicion = True
                 elif tipo == 3:  # F1 = < y F2 = >
-                    if F_prima > epsilon1 and F_prima < epsilon2:
+                    if F_prima > epsilon_var1 and F_prima < epsilon_var2:
                         cumple_condicion = True
                 elif tipo == 4:  # F1 = > y F2 = >
-                    if F_prima < epsilon1 and F_prima < epsilon2:
+                    if F_prima < epsilon_var1 and F_prima < epsilon_var2:
                         cumple_condicion = True
 
                 if cumple_condicion:
@@ -399,10 +523,6 @@ def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo):
     nanopore_mesh.save('results/F_prime_result.stl')
     print(".STL generado correctamente!")
 
-
-
-
-
 def nocubicos(a,b,c,alpha,beta,gama):
     matriz = []
     matriz.append(a)
@@ -417,8 +537,33 @@ def crear_fi(permutaciones):
         fi.append(randfloat(0, 2*pi))
     return fi
 
+#L Obtener dimensiones de la caja
+def obtener_dimensiones_caja(archivo1):
+    with open(archivo1, "r") as f:
+        lines = [next(f) for _ in range(9)]
+        Lx = float(lines[5].split()[1]) - float(lines[5].split()[0])
+        Ly = float(lines[6].split()[1]) - float(lines[6].split()[0])
+        Lz = float(lines[7].split()[1]) - float(lines[7].split()[0])
+    return Lx, Ly, Lz
+
+#L Funcion lambda
+def lambda_xyz(x, y, z, nx, ny, nz, Lx, Ly, Lz):
+    val = 0
+    count = 0
+    if nx is not None:
+        val += np.sin(2 * np.pi * nx * x / Lx)
+        count += 1
+    if ny is not None:
+        val += np.sin(2 * np.pi * ny * y / Ly)
+        count += 1
+    if nz is not None:
+        val += np.sin(2 * np.pi * nz * z / Lz)
+        count += 1
+    return val, count
+
  
-def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacionesE1, valor_permutacionesE2, nombre_resultante,nombre_resultante2, nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2):
+def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacionesE1, valor_permutacionesE2, nombre_resultante,nombre_resultante2, nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2,
+                ax=None, nx=None, ay=None, ny=None, az=None, nz=None, nx_lambda=0, ny_lambda=0, nz_lambda=0):
     if not os.path.exists("process_files"):
             os.makedirs("process_files")
     permutaciones = numerosiniciales(sqrt(valor_permutacionesE1),valor_permutacionesE1, nombre_variables,value_x,value_y,value_z,simbolo1)
@@ -439,9 +584,10 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
                 try:
                     print("F1 = < ---- F2 = <")
                     type=1
-                    mayor1=Formula_mayores(permutaciones,archivo1,epsilon1,fi)
-                    mayor2=Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1)
-                    hybrid_function(archivo1, mayor1,mayor2, epsilon1, epsilon2,type)
+                    mayor1=Formula_mayores(permutaciones,archivo1,epsilon1,fi, ax, nx, ay, ny, az, nz)
+                    mayor2=Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1, ax, nx, ay, ny, az, nz)
+                    hybrid_function(archivo1, mayor1, mayor2, epsilon1, epsilon2, type, ax, nx, ay, ny, 
+                                    az, nz, nx_lambda, ny_lambda, nz_lambda)
                     #F_prima = lambda_ * mayor1 + (1 - lambda_) * mayor2
 
                 except:
@@ -455,9 +601,9 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
                 try:
                     print("F1 = > ---- F2 = <")
                     type=2
-                    menor1 = Formula_menores(permutaciones,archivo1,epsilon1,fi)
-                    mayor2= Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1)
-                    hybrid_function(archivo1, menor1,mayor2, epsilon1, epsilon2,type)
+                    menor1 = Formula_menores(permutaciones,archivo1,epsilon1,fi, ax, nx, ay, ny, az, nz)
+                    mayor2 = Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1, ax, nx, ay, ny, az, nz)
+                    hybrid_function(archivo1, menor1, mayor2, epsilon1, epsilon2, type, ax, nx, ay, ny, az, nz, nx_lambda, ny_lambda, nz_lambda)
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
                 aleacion("file1.dump",nombre_resultante,nombre_variables)
@@ -470,7 +616,8 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
                     type=3
                     mayor1=Formula_mayores(permutaciones,archivo1,epsilon1,fi)
                     menor2=Formula_menores2(permutaciones2,archivo1,epsilon2,fi1)
-                    hybrid_function(archivo1, mayor1,menor2, epsilon1, epsilon2,type)
+                    hybrid_function(archivo1, mayor1, menor2, epsilon1, epsilon2, type, ax, nx, ay, ny, 
+                                    az, nz, nx_lambda, ny_lambda, nz_lambda)
 
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
@@ -484,7 +631,8 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
                     type=4
                     menor1=Formula_menores(permutaciones,archivo1,epsilon1,fi)
                     menor2=Formula_menores2(permutaciones2,archivo1,epsilon2,fi1)
-                    hybrid_function(archivo1, mayor1,menor2, epsilon1, epsilon2,type)
+                    hybrid_function(archivo1, menor1, menor2, epsilon1, epsilon2, type, ax, nx, ay, ny, 
+                                    az, nz, nx_lambda, ny_lambda, nz_lambda) #L CORRECCION?? "mayor1" deberia ser "menor1"???
                 except:
                     return("File 1","Error in File 1\nIncorrect Format")
                 aleacion("file1.dump",nombre_resultante,nombre_variables)

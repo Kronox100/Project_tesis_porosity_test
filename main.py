@@ -1,13 +1,15 @@
 import sys
 import os
-from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QMessageBox, QFileDialog, QFrame, QProgressDialog
+from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QHBoxLayout, QMessageBox, QFileDialog, QFrame, QScrollArea
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 import Soyarslan_no_cubico as Soyarslan_no_cubico
 
 class MyThread(QThread):
     resultado_signal = pyqtSignal(tuple)
 
-    def __init__(self, archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2, nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2):
+    def __init__(self, archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2,
+                 nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,
+                 value_z,value_x2,value_y2,value_z2,ax, nx, ay, ny, az, nz, nx_lambda, ny_lambda, nz_lambda):
         super().__init__()
         self.archivo1 = archivo1
         self.epsilon1 = epsilon1
@@ -26,6 +28,17 @@ class MyThread(QThread):
         self.nombre_resultante2 = nombre_resultante2
         self.nombre_variables = nombre_variables
         self.nombre_variables2 = nombre_variables2
+        #L Nuevos argumentos senoidales
+        self.ax = ax
+        self.nx = nx
+        self.ay = ay
+        self.ny = ny
+        self.az = az
+        self.nz = nz
+        #L Nuevos argumentos lambda
+        self.nx_lambda = nx_lambda
+        self.ny_lambda = ny_lambda
+        self.nz_lambda = nz_lambda
 
 
     def run(self):
@@ -37,7 +50,9 @@ class MyThread(QThread):
                 self.nombre_resultante, self.nombre_resultante2,
                 self.nombre_variables, self.nombre_variables2,
                 self.valor_x, self.valor_y, self.valor_z,
-                self.valor_x2, self.valor_y2, self.valor_z2
+                self.valor_x2, self.valor_y2, self.valor_z2,
+                self.ax, self.nx, self.ay, self.ny, self.az, self.nz,
+                self.nx_lambda, self.ny_lambda, self.nz_lambda
             )
             if isinstance(resultado, tuple):  # Si ya es un tuple, úsalo directamente
                 self.resultado_signal.emit(resultado)
@@ -54,6 +69,7 @@ class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Nanopore Structure')
+        self.resize(820, 700)
         self.layout = QVBoxLayout()
         self.setStyleSheet("background-color: #b1bbd7;")
 
@@ -69,7 +85,9 @@ class MainWindow(QWidget):
         botones_confirmar = "QPushButton {color: white; background-color: #263576; padding: 5px; border-radius: 7.5px;font-family: Arial; font-size: 14pt;} QPushButton:hover {background-color: #2759BE; color: white;}"
 
         # Crear el layout principal
-        layout_principal = QVBoxLayout(self)
+        content_widget = QWidget()
+        layout_principal = QVBoxLayout(content_widget)
+        content_widget.setLayout(layout_principal)
         
         # Frames
         def crear_frame_contenido(layout):
@@ -84,6 +102,13 @@ class MainWindow(QWidget):
             frame = crear_frame_contenido(layout)
             layout_principal.addWidget(frame)
             layout_principal.addSpacing(10)
+
+        def ajustar_margenes(label, ancho=60):
+            label.setMinimumWidth(ancho)
+            label.setMaximumWidth(ancho)
+            label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+            label.setStyleSheet("font-family: Arial; font-size: 14pt; color: black;")
+            return label
 
         # Layout titulo
         layout_titulo = QHBoxLayout()
@@ -249,12 +274,137 @@ class MainWindow(QWidget):
         F2_CoordsXYZ.addWidget(Z2_entry)
 
         layout_f2.addLayout(F2_layout)
+
+
         layout_f2.addLayout(F2_Coords)
         layout_f2.addLayout(F2_CoordsXYZ)
 
-        # Sección 3: Permutaciones y Nombre Resultado
-        layout_seccion3 = QVBoxLayout()
+        #L Campos senoidales
+        layout_senoidal = QHBoxLayout()
+        
+        # Título para la sección
+        layout_senoidal_con_titulo = QVBoxLayout()
+        label_senoidal_title = QLabel("Variable Porosity")
+        label_senoidal_title.setStyleSheet("font-family: Arial; font-size: 16pt; font-weight: bold; color: #263576;")
+        label_senoidal_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout_senoidal_con_titulo.addWidget(label_senoidal_title)
+        
+        # Columna de Amplitudes (A)
+        layout_A = QVBoxLayout()
+        ax_layout = QHBoxLayout()
+        label_ax = ajustar_margenes(QLabel("Ax:"))
+        entry_ax = QLineEdit()
+        entry_ax.setStyleSheet(borde_entry)
+        entry_ax.setFixedSize(80, 36)
+        ax_layout.addWidget(label_ax)
+        ax_layout.addWidget(entry_ax)
+        layout_A.addLayout(ax_layout)
+        
+        ay_layout = QHBoxLayout()
+        label_ay = ajustar_margenes(QLabel("Ay:"))
+        entry_ay = QLineEdit()
+        entry_ay.setStyleSheet(borde_entry)
+        entry_ay.setFixedSize(80, 36)
+        ay_layout.addWidget(label_ay)
+        ay_layout.addWidget(entry_ay)
+        layout_A.addLayout(ay_layout)
+        
+        az_layout = QHBoxLayout()
+        label_az = ajustar_margenes(QLabel("Az:"))
+        entry_az = QLineEdit()
+        entry_az.setStyleSheet(borde_entry)
+        entry_az.setFixedSize(80, 36)
+        az_layout.addWidget(label_az)
+        az_layout.addWidget(entry_az)
+        layout_A.addLayout(az_layout)
+        
+        # Columna de Frecuencias (n)
+        layout_n = QVBoxLayout()
+        nx_layout = QHBoxLayout()
+        label_nx = ajustar_margenes(QLabel("nx:"))
+        entry_nx = QLineEdit()
+        entry_nx.setStyleSheet(borde_entry)
+        entry_nx.setFixedSize(80, 36)
+        nx_layout.addWidget(label_nx)
+        nx_layout.addWidget(entry_nx)
+        layout_n.addLayout(nx_layout)
+        
+        ny_layout = QHBoxLayout()
+        label_ny = ajustar_margenes(QLabel("ny:"))
+        entry_ny = QLineEdit()
+        entry_ny.setStyleSheet(borde_entry)
+        entry_ny.setFixedSize(80, 36)
+        ny_layout.addWidget(label_ny)
+        ny_layout.addWidget(entry_ny)
+        layout_n.addLayout(ny_layout)
+        
+        nz_layout = QHBoxLayout()
+        label_nz = ajustar_margenes(QLabel("nz:"))
+        entry_nz = QLineEdit()
+        entry_nz.setStyleSheet(borde_entry)
+        entry_nz.setFixedSize(80, 36)
+        nz_layout.addWidget(label_nz)
+        nz_layout.addWidget(entry_nz)
+        layout_n.addLayout(nz_layout)
+        
+        layout_senoidal.addLayout(layout_A)
+        layout_senoidal.addSpacing(30)
+        layout_senoidal.addLayout(layout_n)
+        
+        layout_senoidal_con_titulo.addLayout(layout_senoidal)
 
+        #L Parámetros de la función lambda
+        layout_lambda_con_titulo = QVBoxLayout()
+        label_lambda_title = QLabel("Lambda Parameters")
+        label_lambda_title.setStyleSheet("font-family: Arial; font-size: 16pt; font-weight: bold; color: #263576;")
+        label_lambda_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout_lambda_con_titulo.addWidget(label_lambda_title)
+        
+        layout_lambda = QVBoxLayout()
+        
+        # nx
+        nx_lambda_layout = QHBoxLayout()
+        label_nx_lambda = ajustar_margenes(QLabel("nx:"), 50)
+        entry_nx_lambda = QLineEdit()
+        entry_nx_lambda.setStyleSheet(borde_entry)
+        entry_nx_lambda.setFixedSize(70, 36)
+        nx_lambda_layout.addWidget(label_nx_lambda)
+        nx_lambda_layout.addWidget(entry_nx_lambda)
+        layout_lambda.addLayout(nx_lambda_layout)
+        
+        # ny
+        ny_lambda_layout = QHBoxLayout()
+        label_ny_lambda = ajustar_margenes(QLabel("ny:"), 50)
+        entry_ny_lambda = QLineEdit()
+        entry_ny_lambda.setStyleSheet(borde_entry)
+        entry_ny_lambda.setFixedSize(70, 36)
+        ny_lambda_layout.addWidget(label_ny_lambda)
+        ny_lambda_layout.addWidget(entry_ny_lambda)
+        layout_lambda.addLayout(ny_lambda_layout)
+        
+        # nz
+        nz_lambda_layout = QHBoxLayout()
+        label_nz_lambda = ajustar_margenes(QLabel("nz:"), 50)
+        entry_nz_lambda = QLineEdit()
+        entry_nz_lambda.setStyleSheet(borde_entry)
+        entry_nz_lambda.setFixedSize(70, 36)
+        nz_lambda_layout.addWidget(label_nz_lambda)
+        nz_lambda_layout.addWidget(entry_nz_lambda)
+        layout_lambda.addLayout(nz_lambda_layout)
+        
+        layout_lambda_con_titulo.addLayout(layout_lambda)
+        
+        layout_parametros = QHBoxLayout()
+        layout_parametros.addLayout(layout_senoidal_con_titulo)
+        layout_parametros.addSpacing(40)
+        layout_parametros.addLayout(layout_lambda_con_titulo)
+
+
+        # Sección 3: Permutaciones y Nombre Resultado
+        layout_seccion3_col = QHBoxLayout()
+
+        # Columna 1: Permutaciones
+        layout_permutaciones = QVBoxLayout()
         permut1_layout = QHBoxLayout()
         permut1_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         label_permutacion = QLabel("Permutations F1:")
@@ -263,6 +413,9 @@ class MainWindow(QWidget):
         entry_permutacion = QLineEdit()
         entry_permutacion.setStyleSheet(borde_entry)
         entry_permutacion.setFixedSize(100,36)
+        permut1_layout.addWidget(label_permutacion)
+        permut1_layout.addWidget(entry_permutacion)
+        layout_permutaciones.addLayout(permut1_layout)
 
         permut2_layout = QHBoxLayout()
         permut2_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
@@ -272,12 +425,12 @@ class MainWindow(QWidget):
         entry_2permutacion = QLineEdit()
         entry_2permutacion.setStyleSheet(borde_entry)
         entry_2permutacion.setFixedSize(100,36)
-
-        permut1_layout.addWidget(label_permutacion)
-        permut1_layout.addWidget(entry_permutacion)
         permut2_layout.addWidget(Label_2permutacion)
         permut2_layout.addWidget(entry_2permutacion)
+        layout_permutaciones.addLayout(permut2_layout)
 
+        # Columna 2: Output File Names
+        layout_outputs = QVBoxLayout()
         layout_1stOut = QHBoxLayout()
         layout_1stOut.setAlignment(Qt.AlignmentFlag.AlignLeft)
         label_nombre_archivo = QLabel("Output File 1 Name:")
@@ -286,6 +439,9 @@ class MainWindow(QWidget):
         nombre_archivo_entry = QLineEdit("Result 1")
         nombre_archivo_entry.setStyleSheet(borde_entry)
         nombre_archivo_entry.setFixedSize(190,36)
+        layout_1stOut.addWidget(label_nombre_archivo)
+        layout_1stOut.addWidget(nombre_archivo_entry)
+        layout_outputs.addLayout(layout_1stOut)
 
         layout_2ndOut = QHBoxLayout()
         layout_2ndOut.setAlignment(Qt.AlignmentFlag.AlignLeft)
@@ -295,30 +451,43 @@ class MainWindow(QWidget):
         nombre_2ndResult = QLineEdit("Result 2")
         nombre_2ndResult.setStyleSheet(borde_entry)
         nombre_2ndResult.setFixedSize(190,36)
-        layout_1stOut.addWidget(label_nombre_archivo)
-        layout_1stOut.addWidget(nombre_archivo_entry)
         layout_2ndOut.addWidget(label2nd_Outarchivo)
         layout_2ndOut.addWidget(nombre_2ndResult)
+        layout_outputs.addLayout(layout_2ndOut)
 
-        layout7 = QHBoxLayout()
+        layout_confirm = QHBoxLayout()
         boton_confirmar = QPushButton("Confirm")
-        boton_confirmar.clicked.connect(lambda: self.confirmar(archivo1_entry, epsilon1_entry,E2_entry,boton_simbolo,btn_Simbolo2, entry_permutacion,entry_2permutacion, nombre_archivo_entry,X_entry, Y_entry,Z_entry,X2_entry, Y2_entry,Z2_entry))
+        boton_confirmar.clicked.connect(lambda: self.confirmar(archivo1_entry, epsilon1_entry, E2_entry, boton_simbolo, btn_Simbolo2,
+                                                               entry_permutacion, entry_2permutacion, nombre_archivo_entry,X_entry, Y_entry, Z_entry, 
+                                                               X2_entry, Y2_entry, Z2_entry,entry_ax, entry_nx, entry_ay, entry_ny, entry_az, entry_nz,
+                                                               entry_nx_lambda, entry_ny_lambda, entry_nz_lambda))
         boton_confirmar.setStyleSheet(botones_confirmar)
         boton_confirmar.setFixedSize(98,36)
-        layout7.addWidget(boton_confirmar)
+        layout_confirm.addWidget(boton_confirmar)
 
-        layout_seccion3.addLayout(permut1_layout)
-        layout_seccion3.addLayout(permut2_layout)
-        layout_seccion3.addLayout(layout_1stOut)
-        layout_seccion3.addLayout(layout_2ndOut)
-        layout_seccion3.addLayout(layout7)
+        layout_seccion3_v = QVBoxLayout()
+        layout_seccion3_col.addLayout(layout_permutaciones)
+        layout_seccion3_col.addSpacing(40)
+        layout_seccion3_col.addLayout(layout_outputs)
+        layout_seccion3_v.addLayout(layout_seccion3_col)
+        layout_seccion3_v.addSpacing(10)
+        layout_seccion3_v.addLayout(layout_confirm)
 
         layout_principal.addLayout(layout_titulo)
         layout_principal.addLayout(layout_sub_titulo)
         agregar_seccion(layout_seccion1)
         agregar_seccion(layout_seccion2)
         agregar_seccion(layout_f2)
-        agregar_seccion(layout_seccion3)
+        agregar_seccion(layout_parametros)
+        agregar_seccion(layout_seccion3_v)
+
+        scroll = QScrollArea(self)
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(content_widget)
+
+        main_layout = QVBoxLayout(self)
+        main_layout.addWidget(scroll)
+        self.setLayout(main_layout)
 
     def seleccionar_archivo(self, entry):
         filename, _ = QFileDialog.getOpenFileName(None, "Seleccionar archivo", "", "Todos los archivos (*);;Archivos de texto (*.txt)")
@@ -345,7 +514,11 @@ class MainWindow(QWidget):
         else:
             label_valor_epsilon1.setText("E2")
 
-    def confirmar(self,archivo1_entry, epsilon1_entry,E2_entry,boton_simbolo,btn_Simbolo2, entry_permutacion,entry_2permutacion, nombre_archivo_entry,X_entry, Y_entry,Z_entry,X2_entry, Y2_entry,Z2_entry):
+    def confirmar(self, archivo1_entry, epsilon1_entry, E2_entry, boton_simbolo, btn_Simbolo2,
+              entry_permutacion, entry_2permutacion, nombre_archivo_entry,
+              X_entry, Y_entry, Z_entry, X2_entry, Y2_entry, Z2_entry,
+              entry_ax, entry_nx, entry_ay, entry_ny, entry_az, entry_nz,
+              entry_nx_lambda, entry_ny_lambda, entry_nz_lambda):
         mensaje = QMessageBox()
         mensaje.setWindowTitle("Confirmation")
         mensaje.setText("The data is correct?")
@@ -356,11 +529,18 @@ class MainWindow(QWidget):
         reply = mensaje.exec()
         if reply == QMessageBox.StandardButton.Yes:
             print("The operation was confirmed")
-            self.confirmar_operacion(archivo1_entry, epsilon1_entry,E2_entry,boton_simbolo,btn_Simbolo2, entry_permutacion,entry_2permutacion, nombre_archivo_entry,X_entry, Y_entry,Z_entry,X2_entry, Y2_entry,Z2_entry)
+            self.confirmar_operacion(archivo1_entry, epsilon1_entry, E2_entry, boton_simbolo, btn_Simbolo2,
+                                     entry_permutacion, entry_2permutacion, nombre_archivo_entry,X_entry, 
+                                     Y_entry, Z_entry, X2_entry, Y2_entry, Z2_entry,entry_ax, entry_nx, 
+                                     entry_ay, entry_ny, entry_az, entry_nz, entry_nx_lambda, entry_ny_lambda, entry_nz_lambda)
         else:
             print("The operation was canceled")
 
-    def confirmar_operacion(self,archivo1_var, E1_var,E2_var, boton_simbolo_var,btn_Simbolo2_var, entry_permutacion_var, entry_2permutacion, nombre_archivo_entry,valor_x_var,valor_y_var,valor_z_var,valor_x2_var,valor_y2_var,valor_z2_var):
+    def confirmar_operacion(self,archivo1_var, E1_var,E2_var, boton_simbolo_var,btn_Simbolo2_var, 
+                            entry_permutacion_var, entry_2permutacion, nombre_archivo_entry,valor_x_var,
+                            valor_y_var,valor_z_var,valor_x2_var,valor_y2_var,valor_z2_var,
+                            entry_ax=None, entry_nx=None, entry_ay=None, entry_ny=None, entry_az=None, entry_nz=None,
+                            entry_nx_lambda=None, entry_ny_lambda=None, entry_nz_lambda=None):
         if not os.path.exists("results"):
             os.makedirs("results")
         try:
@@ -417,6 +597,75 @@ class MainWindow(QWidget):
         except:
             QMessageBox.information(None, "Z F2", "Incorrect Coord Format")
             return
+        
+        #L Validación de campos senoidales para E1
+        try:
+            ax = float(entry_ax.text()) if entry_ax and entry_ax.text() else 0
+        except:
+            QMessageBox.information(None, "Ax", "Incorrect Ax Format")
+            return
+        try:
+            nx = int(entry_nx.text()) if entry_nx and entry_nx.text() else 0
+        except:
+            QMessageBox.information(None, "nx", "Incorrect nx Format")
+            return
+        try:
+            ay = float(entry_ay.text()) if entry_ay and entry_ay.text() else 0
+        except:
+            QMessageBox.information(None, "Ay", "Incorrect Ay Format")
+            return
+        try:
+            ny = int(entry_ny.text()) if entry_ny and entry_ny.text() else 0
+        except:
+            QMessageBox.information(None, "ny", "Incorrect ny Format")
+            return
+        try:
+            az = float(entry_az.text()) if entry_az and entry_az.text() else 0
+        except:
+            QMessageBox.information(None, "Az", "Incorrect Az Format")
+            return
+        try:
+            nz = int(entry_nz.text()) if entry_nz and entry_nz.text() else 0
+        except:
+            QMessageBox.information(None, "nz", "Incorrect nz Format")
+            return
+        
+        #L Validación de campos lambda
+        try:
+            nx_lambda = int(entry_nx_lambda.text()) if entry_nx_lambda and entry_nx_lambda.text() else None
+        except:
+            QMessageBox.information(None, "nx_lambda", "Incorrect nx_lambda Format")
+            return
+        try:
+            ny_lambda = int(entry_ny_lambda.text()) if entry_ny_lambda and entry_ny_lambda.text() else None
+        except:
+            QMessageBox.information(None, "ny_lambda", "Incorrect ny_lambda Format")
+            return
+        try:
+            nz_lambda = int(entry_nz_lambda.text()) if entry_nz_lambda and entry_nz_lambda.text() else None
+        except:
+            QMessageBox.information(None, "nz_lambda", "Incorrect nz_lambda Format")
+            return
+        print("Lambda params:", nx_lambda, ny_lambda, nz_lambda)
+
+        #L Obtener valores senoidales para E1
+        ax = float(entry_ax.text()) if entry_ax and entry_ax.text() else 0
+        nx = int(entry_nx.text()) if entry_nx and entry_nx.text() else 0
+        ay = float(entry_ay.text()) if entry_ay and entry_ay.text() else 0
+        ny = int(entry_ny.text()) if entry_ny and entry_ny.text() else 0
+        az = float(entry_az.text()) if entry_az and entry_az.text() else 0
+        nz = int(entry_nz.text()) if entry_nz and entry_nz.text() else 0
+
+        #L Imprimir los valores capturados:
+        print("Valores senoidales:", ax, nx, ay, ny, az, nz)
+
+        QMessageBox.information(
+            None,
+            "Senoidales y Lambda capturados",
+            f"E: {ax}, {nx}, {ay}, {ny}, {az}, {nz}\n"
+            f"Lambda: {nx_lambda}, {ny_lambda}, {nz_lambda}"
+        )
+
         simbolo1 = str(boton_simbolo_var.text())
         simbolo2 = str(btn_Simbolo2_var.text())
         nombre_variables = str(nombre_archivo_entry.text())
@@ -445,7 +694,8 @@ class MainWindow(QWidget):
 
                 # Proceso en otro hilo
                 self.thread = MyThread(archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2, 
-                                        nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2)
+                                        nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2,
+                                        ax, nx, ay, ny, az, nz, nx_lambda, ny_lambda, nz_lambda)
                 self.thread.resultado_signal.connect(self.show_result)
                 self.thread.start()
             else:
@@ -471,7 +721,8 @@ class MainWindow(QWidget):
 
                 # Proceso en otro hilo
                 self.thread = MyThread(archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2, 
-                                        nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2)
+                                        nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2,
+                                        ax, nx, ay, ny, az, nz, nx_lambda, ny_lambda, nz_lambda)
                 self.thread.resultado_signal.connect(self.show_result)
                 self.thread.start()
             else:
@@ -497,7 +748,8 @@ class MainWindow(QWidget):
 
                 # Proceso en otro hilo
                 self.thread = MyThread(archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2, 
-                                        nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2)
+                                        nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2,
+                                        ax, nx, ay, ny, az, nz, nx_lambda, ny_lambda, nz_lambda)
                 self.thread.resultado_signal.connect(self.show_result)
                 self.thread.start()
             else:
@@ -523,7 +775,8 @@ class MainWindow(QWidget):
 
                 # Proceso en otro hilo
                 self.thread = MyThread(archivo1, epsilon1,epsilon2, simbolo1,simbolo2 , valor_permutacionesE1,valor_permutacionesE2, 
-                                        nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2)
+                                        nombre_resultante,nombre_resultante2,nombre_variables,nombre_variables2,value_x,value_y,value_z,value_x2,value_y2,value_z2,
+                                        ax, nx, ay, ny, az, nz, nx_lambda, ny_lambda, nz_lambda)
                 self.thread.resultado_signal.connect(self.show_result)
                 self.thread.start()
             else:
