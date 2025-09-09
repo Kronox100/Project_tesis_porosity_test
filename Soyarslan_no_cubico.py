@@ -455,16 +455,16 @@ def hybrid_function(archivo1, value1, value2, epsilon1, epsilon2, tipo, ax=0, nx
                 # Evaluar si F_prima cumple la condición para incrementar según el tipo
                 cumple_condicion = False
                 if tipo == 1:  # F1 = < y F2 = <
-                    if F_prima > epsilon_var1 and F_prima > epsilon_var2:
+                    if F_prima < epsilon_var1 and F_prima < epsilon_var2:
                         cumple_condicion = True
                 elif tipo == 2:  # F1 = > y F2 = <
-                    if F_prima < epsilon_var1 and F_prima > epsilon_var2:
-                        cumple_condicion = True
-                elif tipo == 3:  # F1 = < y F2 = >
                     if F_prima > epsilon_var1 and F_prima < epsilon_var2:
                         cumple_condicion = True
+                elif tipo == 3:  # F1 = < y F2 = >
+                    if F_prima < epsilon_var1 and F_prima > epsilon_var2:
+                        cumple_condicion = True
                 elif tipo == 4:  # F1 = > y F2 = >
-                    if F_prima < epsilon_var1 and F_prima < epsilon_var2:
+                    if F_prima > epsilon_var1 and F_prima > epsilon_var2:
                         cumple_condicion = True
 
                 if cumple_condicion:
@@ -583,61 +583,132 @@ def funcion_app(archivo1, epsilon1,epsilon2, simbolo1,simbolo2, valor_permutacio
             if simbolo1 == "<" and simbolo2 == "<":
                 try:
                     print("F1 = < ---- F2 = <")
-                    type=1
-                    mayor1=Formula_mayores(permutaciones,archivo1,epsilon1,fi, ax, nx, ay, ny, az, nz)
-                    mayor2=Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1, ax, nx, ay, ny, az, nz)
-                    hybrid_function(archivo1, mayor1, mayor2, epsilon1, epsilon2, type, ax, nx, ay, ny, 
-                                    az, nz, nx_lambda, ny_lambda, nz_lambda)
-                    #F_prima = lambda_ * mayor1 + (1 - lambda_) * mayor2
-
+                    type = 1
+                    menor1 = Formula_menores(permutaciones, archivo1, epsilon1, fi, ax, nx, ay, ny, az, nz)
+                    menor2 = Formula_menores2(permutaciones2, archivo1, epsilon2, fi1, ax, nx, ay, ny, az, nz)
+                    hybrid_function(
+                        archivo1,
+                        menor1,
+                        menor2,
+                        epsilon1,
+                        epsilon2,
+                        type,
+                        ax,
+                        nx,
+                        ay,
+                        ny,
+                        az,
+                        nz,
+                        nx_lambda,
+                        ny_lambda,
+                        nz_lambda,
+                    )
                 except:
-                    return("File 1","Error in File 1\nIncorrect Format")
-                aleacion("file1.dump",nombre_resultante,nombre_variables)
-                aleacion("file2.dump",nombre_resultante2,nombre_variables2)
-                aleacion("F_prime_result.dump",'F_prime_result.dump','F_prime_result')
-                
-                return("Complete","The file has been created successfully.\nResults saved in the 'results' folder.")
+                    return ("File 1", "Error in File 1\nIncorrect Format")
+                aleacion("file1.dump", nombre_resultante, nombre_variables)
+                aleacion("file2.dump", nombre_resultante2, nombre_variables2)
+                aleacion("F_prime_result.dump", "F_prime_result.dump", "F_prime_result")
+
+                return (
+                    "Complete",
+                    "The file has been created successfully.\nResults saved in the 'results' folder.",
+                )
             elif simbolo1 == ">" and simbolo2 == "<":
                 try:
                     print("F1 = > ---- F2 = <")
-                    type=2
-                    menor1 = Formula_menores(permutaciones,archivo1,epsilon1,fi, ax, nx, ay, ny, az, nz)
-                    mayor2 = Formula_mayores2(permutaciones2,archivo1,epsilon2,fi1, ax, nx, ay, ny, az, nz)
-                    hybrid_function(archivo1, menor1, mayor2, epsilon1, epsilon2, type, ax, nx, ay, ny, az, nz, nx_lambda, ny_lambda, nz_lambda)
+                    type = 2
+                    mayor1 = Formula_mayores(permutaciones, archivo1, epsilon1, fi, ax, nx, ay, ny, az, nz)
+                    menor2 = Formula_menores2(permutaciones2, archivo1, epsilon2, fi1, ax, nx, ay, ny, az, nz)
+                    hybrid_function(
+                        archivo1,
+                        mayor1,
+                        menor2,
+                        epsilon1,
+                        epsilon2,
+                        type,
+                        ax,
+                        nx,
+                        ay,
+                        ny,
+                        az,
+                        nz,
+                        nx_lambda,
+                        ny_lambda,
+                        nz_lambda,
+                    )
                 except:
-                    return("File 1","Error in File 1\nIncorrect Format")
-                aleacion("file1.dump",nombre_resultante,nombre_variables)
-                aleacion("file2.dump",nombre_resultante2,nombre_variables2)
-                aleacion("F_prime_result.dump",'F_prime_result.dump','F_prime_result')
-                return("Complete","The file has been created successfully.\nResults saved in the 'results' folder.")
+                    return ("File 1", "Error in File 1\nIncorrect Format")
+                aleacion("file1.dump", nombre_resultante, nombre_variables)
+                aleacion("file2.dump", nombre_resultante2, nombre_variables2)
+                aleacion("F_prime_result.dump", "F_prime_result.dump", "F_prime_result")
+                return (
+                    "Complete",
+                    "The file has been created successfully.\nResults saved in the 'results' folder.",
+                )
             elif simbolo1 == "<" and simbolo2 == ">":
                 try:
                     print("F1 = < ---- F2 = >")
-                    type=3
-                    mayor1=Formula_mayores(permutaciones,archivo1,epsilon1,fi)
-                    menor2=Formula_menores2(permutaciones2,archivo1,epsilon2,fi1)
-                    hybrid_function(archivo1, mayor1, menor2, epsilon1, epsilon2, type, ax, nx, ay, ny, 
-                                    az, nz, nx_lambda, ny_lambda, nz_lambda)
+                    type = 3
+                    menor1 = Formula_menores(permutaciones, archivo1, epsilon1, fi)
+                    mayor2 = Formula_mayores2(permutaciones2, archivo1, epsilon2, fi1)
+                    hybrid_function(
+                        archivo1,
+                        menor1,
+                        mayor2,
+                        epsilon1,
+                        epsilon2,
+                        type,
+                        ax,
+                        nx,
+                        ay,
+                        ny,
+                        az,
+                        nz,
+                        nx_lambda,
+                        ny_lambda,
+                        nz_lambda,
+                    )
 
                 except:
-                    return("File 1","Error in File 1\nIncorrect Format")
-                aleacion("file1.dump",nombre_resultante,nombre_variables)
-                aleacion("file2.dump",nombre_resultante2,nombre_variables2)
-                aleacion("F_prime_result.dump",'F_prime_result.dump','F_prime_result')
-                return("Complete","The file has been created successfully.\nResults saved in the 'results' folder.")
+                    return ("File 1", "Error in File 1\nIncorrect Format")
+                aleacion("file1.dump", nombre_resultante, nombre_variables)
+                aleacion("file2.dump", nombre_resultante2, nombre_variables2)
+                aleacion("F_prime_result.dump", "F_prime_result.dump", "F_prime_result")
+                return (
+                    "Complete",
+                    "The file has been created successfully.\nResults saved in the 'results' folder.",
+                )
             elif simbolo1 == ">" and simbolo2 == ">":
                 try:
                     print("F1 = > ---- F2 = >")
-                    type=4
-                    menor1=Formula_menores(permutaciones,archivo1,epsilon1,fi)
-                    menor2=Formula_menores2(permutaciones2,archivo1,epsilon2,fi1)
-                    hybrid_function(archivo1, menor1, menor2, epsilon1, epsilon2, type, ax, nx, ay, ny, 
-                                    az, nz, nx_lambda, ny_lambda, nz_lambda) #L CORRECCION?? "mayor1" deberia ser "menor1"???
+                    type = 4
+                    mayor1 = Formula_mayores(permutaciones, archivo1, epsilon1, fi)
+                    mayor2 = Formula_mayores2(permutaciones2, archivo1, epsilon2, fi1)
+                    hybrid_function(
+                        archivo1,
+                        mayor1,
+                        mayor2,
+                        epsilon1,
+                        epsilon2,
+                        type,
+                        ax,
+                        nx,
+                        ay,
+                        ny,
+                        az,
+                        nz,
+                        nx_lambda,
+                        ny_lambda,
+                        nz_lambda,
+                    )
                 except:
-                    return("File 1","Error in File 1\nIncorrect Format")
-                aleacion("file1.dump",nombre_resultante,nombre_variables)
-                aleacion("file2.dump",nombre_resultante2,nombre_variables2)
-                aleacion("F_prime_result.dump",'F_prime_result.dump','F_prime_result')
-                return("Complete","The file has been created successfully.\nResults saved in the 'results' folder.")
+                    return ("File 1", "Error in File 1\nIncorrect Format")
+                aleacion("file1.dump", nombre_resultante, nombre_variables)
+                aleacion("file2.dump", nombre_resultante2, nombre_variables2)
+                aleacion("F_prime_result.dump", "F_prime_result.dump", "F_prime_result")
+                return (
+                    "Complete",
+                    "The file has been created successfully.\nResults saved in the 'results' folder.",
+                )
         except:
             return("Error in the Program")
